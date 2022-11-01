@@ -1,0 +1,199 @@
+* {
+  font-family: Arial, Helvetica, sans-serif;
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0px;
+  padding: 0px;
+  /*background: url('images/vif-fancy-background-desaturated.jpg');*/
+  background-size:auto;
+  background-repeat:no-repeat;
+  background-color: lightgray;
+}
+
+.header-div {
+  background: #282A35;
+  display: flex;
+  flex-direction: row;  
+  align-items: center;
+  justify-content: space-between;
+  height: 50px;
+  padding-top: 4px;
+  margin-bottom: 5px;
+  border-bottom: 2px solid darkgray;
+
+  animation-name: header-fade-in-anim;
+  animation-duration: 0.5s;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards;
+}
+
+.header-div-left {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;  
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.header-div-center {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;  
+  align-items: center;
+  justify-content: center;
+}
+
+.header-div-right {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;  
+  align-items: center;
+  justify-content: right;
+}
+
+.header-text-left {
+  color:white;
+  font-size: 16px;
+  font-family: monospace;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.container {
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  display: flex;
+  flex-flow: row wrap;           
+  justify-content: space-around; 
+  background: rgba(255, 255, 255, 0.0);
+  border-radius: 5px;
+}
+
+.container-left {
+  display: block;
+  flex: 1 150px;
+  height: 400px;
+  max-width: 300px;
+  padding: 5px;
+  border-radius: 5px;
+  background-color: white;
+  border: 2px solid darkgray;
+  animation-name: fade-in-anim;
+  animation-duration: 0.5s;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards;
+}
+
+.container-right {
+  display: block;
+  flex: 4 150px;
+  height: 800px;
+  padding: 5px;
+  border-radius: 5px;
+  background-color: white;
+  border: 2px solid darkgray;
+}
+
+.control-buttons {
+  width: 100%;
+  margin-top: 3px;
+  font-size: 16px;
+  background-color: lightgray;
+  /*border: 2px solid lightgray;*/
+  border: none;
+  border-radius: 5px;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  transition-duration: 0.2s;
+  outline:none;
+
+  animation-name: fade-in-anim;
+  animation-delay: 0.25s;
+  animation-duration: 0.5s;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: both;
+}
+
+.control-buttons:hover {
+  background-color:#4CAF50;
+  /*border: 2px solid gray;*/
+  color: whitesmoke;
+}
+
+.container-input-form
+{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding-top: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+
+  animation-name: fade-in-anim;
+  animation-delay: 0.5s;
+  animation-duration: 0.5s;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: both;
+}
+
+.input-form
+{
+  width: 25%;
+  margin-right: 0px;
+  text-align: center;
+}
+
+.label-left
+{
+  margin-left: 0px;
+}
+
+.mode-div
+{
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  margin-top: 30px;
+
+  animation-name: fade-in-anim;
+  animation-delay: 0.5s;
+  animation-duration: 0.5s;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: both;
+}
+
+.mode-a
+{
+  font-size: 30px;
+  font-family: 'Times New Roman', serif;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+@keyframes header-fade-in-anim {
+  0%   {transform: translate(0px, -100px); opacity: 0.0}
+  100% {transform: translate(0px, 0px); opacity: 1.0}
+}
+
+@keyframes fade-in-anim {
+  0%   {transform: translate(0px, 100px); opacity: 0.0}
+  100% {transform: translate(0px, 0px); opacity: 1.0}
+}

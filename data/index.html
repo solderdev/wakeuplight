@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Wake-Up Light</title>
+    <meta name="description" content="wake-up-light">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+  <div class="header-div">
+
+    <div class="header-div-left">
+      <a class="header-text-left">
+        Wake-Up Light
+      </a>
+    </div>
+
+  </div>
+
+  <div id="databeam_div_id" class="container">
+
+    <div class="container-left">
+      <button id="on_mode_button_id" class="control-buttons" type="button" style="animation-delay: 0.2s;">On Mode</button>
+      <button id="off_mode_button_id" class="control-buttons" type="button" style="animation-delay: 0.3s;">Off Mode</button>
+      <button id="alarm_mode_button_id" class="control-buttons" type="button" style="animation-delay: 0.4s;">Alarm Mode</button>
+
+      <form id="alarm_time_form_id" class="container-input-form" style="animation-delay: 0.5s;">
+        <label for="alarm_time_name" class="label-left">Alarm Time:</label>
+        <input type="time" id="alarm_time_input_id" name="alarm_time_name" class="input-form" spellcheck="false"
+         step="1" min="16" max="49999">
+      </form>
+
+      <form id="fade_minutes_form_id" class="container-input-form" style="animation-delay: 0.6s;">
+        <label for="fade_minutes_name" class="label-left">Fade Minutes:</label>
+        <input type="number" id="fade_minutes_input_id" name="fade_minutes_name" class="input-form" spellcheck="false" 
+        step="1" min="1" max="120">
+      </form>
+
+      <form id="duty_max_form_id" class="container-input-form" style="animation-delay: 0.6s;">
+        <label for="duty_max_name" class="label-left">Duty Max &#37;:</label>
+        <input type="number" id="duty_max_input_id" name="duty_max_name" class="input-form" spellcheck="false" 
+        step="0.1" min="0.1" max="99.0">
+      </form>
+
+      <form id="duty_min_form_id" class="container-input-form" style="animation-delay: 0.6s;">
+        <label for="duty_min_name" class="label-left">Duty Min &#37;:</label>
+        <input type="number" id="duty_min_input_id" name="duty_min_name" class="input-form" spellcheck="false" 
+        step="0.1" min="0.1" max="99.0">
+      </form>
+
+      <div class="mode-div" style="animation-delay: 0.7s;">
+        <a id="mode_id" class="mode-a">
+          OFF Mode
+        </a>
+      </div>
+    </div>
+
+    <!--
+    <div class="container-right">
+      Right Container
+    </div>
+    --> 
+
+  </div>
+</body>
+
+<script src="./model.js"></script>
+<script src="./view.js"></script>
+<script src="./controller.js"></script>
+</html>
