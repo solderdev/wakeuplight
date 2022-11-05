@@ -1,4 +1,3 @@
-//const char MODEL_JS_CODE[] = R"======(
 
 class Model {
     constructor() 
@@ -28,6 +27,12 @@ class Model {
 
     setParameters(alarm_time, fade_minutes, mode, duty_max, duty_min)
     {
+        console.log('setParameters: alarm_time=' + alarm_time + 
+                    'fade_minutes=' + fade_minutes + 
+                    'mode=' + mode + 
+                    'duty_max=' + duty_max + 
+                    'duty_min=' + duty_min)
+
         this.alarm_time = alarm_time
         this.fade_minutes = fade_minutes
         this.mode = mode
@@ -40,7 +45,6 @@ class Model {
     {
         this.alarm_time = alarm_time
         this.dataChangedCB()
-
     }
 
     setFadeMinutes(fade_minutes)
@@ -76,6 +80,4 @@ class Model {
         return this.duty_min
     }
 }
-
-//)======";
   

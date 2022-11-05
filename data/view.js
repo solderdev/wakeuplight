@@ -1,4 +1,3 @@
-//const char VIEW_JS_CODE[] = R"======(
 
 class View 
 {
@@ -19,7 +18,7 @@ class View
         "submit", event => this.onSubmitPreventDefault(event), true);
 
     document.getElementById('fade_minutes_form_id').addEventListener(
-        "change", event => this.onSubmitDutyCycle(event), true);
+        "change", event => this.onSubmitFadeMinutes(event), true);
     document.getElementById('fade_minutes_form_id').addEventListener(
         "submit", event => this.onSubmitPreventDefault(event), true);
 
@@ -126,5 +125,3 @@ class View
     this.dutyMinSubmitCB(duty_min)
   }
 }
-
-//)======";

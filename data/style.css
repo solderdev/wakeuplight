@@ -78,7 +78,7 @@ html, body {
 .container-left {
   display: block;
   flex: 1 150px;
-  height: 400px;
+  /*height: 400px;*/
   max-width: 300px;
   padding: 5px;
   border-radius: 5px;
@@ -148,9 +148,10 @@ html, body {
 
 .input-form
 {
-  width: 25%;
+  width: 35%;
   margin-right: 0px;
   text-align: center;
+  font-size: 16px;
 }
 
 .label-left
@@ -164,7 +165,7 @@ html, body {
   align-items: center;
   justify-content: space-around;
   margin-top: 30px;
-
+  margin-bottom: 30px;
   animation-name: fade-in-anim;
   animation-delay: 0.5s;
   animation-duration: 0.5s;
@@ -175,7 +176,7 @@ html, body {
 .mode-a
 {
   font-size: 30px;
-  font-family: 'Times New Roman', serif;
+  /*font-family: 'Times New Roman', serif;*/
 }
 
 input::-webkit-outer-spin-button,

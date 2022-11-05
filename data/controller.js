@@ -1,4 +1,3 @@
-//const char CONTROLLER_JS_CODE[] = R"======(
 
 class Controller {
     constructor(model, view)
@@ -24,6 +23,8 @@ class Controller {
 
     fetchParameters()
     {
+        console.log('fetchParameters')
+
         fetch(this.model.getHostURLHTTP() + "parameters", {
             method: 'GET',
             headers: {'Content-Type': 'text/plain'},
@@ -33,8 +34,8 @@ class Controller {
         .then(data => {
             let params = data.split(" ")
             this.model.setParameters(
-                parseInt(params[0]), 
-                parseFloat(params[1]), 
+                params[0], 
+                parseInt(params[1]), 
                 parseInt(params[2]), 
                 parseFloat(params[3]), 
                 parseFloat(params[4]))
@@ -119,5 +120,3 @@ class Controller {
   }
 
   var app = new Controller(new Model(), new View());
-
-  //)======";
