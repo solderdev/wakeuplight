@@ -8,6 +8,15 @@
 				"$platformio"
 			],
 			"label": "PlatformIO: Upload Filesystem Image (esp32dev)"
+		},
+		{
+			"type": "PlatformIO",
+			"task": "Build Filesystem Image (esp32dev)",
+			"problemMatcher": [
+				"$platformio"
+			],
+			"group": "build",
+			"label": "PlatformIO: Build Filesystem Image (esp32dev)"
 		}
 	]
 }
