@@ -21,6 +21,15 @@ class Controller {
       this.fetchParameters()
     }
 
+    intervalUpdate()
+    {
+        console.log("intervalUpdate")
+
+        // TODO: fetch time and display!
+
+        setTimeout(() => {this.intervalUpdate();}, 1000);
+    }
+
     fetchParameters()
     {
         console.log('fetchParameters')
@@ -117,6 +126,10 @@ class Controller {
             this.fetchParameters()
         })
     }
-  }
+}
 
-  var app = new Controller(new Model(), new View());
+var app = new Controller(new Model(), new View());
+
+document.addEventListener('DOMContentLoaded', function() {
+        app.intervalUpdate();
+    }, false);
