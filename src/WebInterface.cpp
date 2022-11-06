@@ -10,6 +10,8 @@
 #include "Pins.hpp"
 #include <sstream>
 
+#include "Private.hpp"
+
 // Docu:
 // https://registry.platformio.org/libraries/me-no-dev/ESP%20Async%20WebServer
 
@@ -18,9 +20,6 @@
 // text to C converter: http://tomeko.net/online_tools/cpp_text_escape.php?lang=en
 
 static const char XML_CODE[] = "<?xml version = \"1.0\"?>\n<inputs>\n<rd>\n%L1%\n</rd>\n<rd>\n%L2%\n</rd>\n<pwr>\n%POWERSTATE%\n</pwr>\n</inputs>";
-
-static const char WIFISSID[] = "A1-962961";
-static const char WIFIPW[] = "1x799rkqri6u";
 
 static const char HOSTNAME[] = "wakeuplight";
 
