@@ -34,19 +34,19 @@ WebInterface::WebInterface(AlarmControl *alarm_control) :
 {
   if (instance)
   {
-    Serial.println("ERROR: more than one WebInterface generated");
+    log_e("ERROR: more than one WebInterface generated");
     ESP.restart();
     return;
   }
 
   // Initialize SPIFFS
   if(!SPIFFS.begin(true)){
-    Serial.println("An Error has occurred while mounting SPIFFS");
+    log_e("An Error has occurred while mounting SPIFFS");
     return;
   }
 
   if (xTaskCreate(&WebInterface::task_http_wrapper, "task_http", TaskConfig::WiFi_http_stacksize, this, TaskConfig::WiFi_http_priority, &task_handle_http_) != pdPASS)
-    Serial.println("WebInterface ERROR init failed");
+    log_e("WebInterface ERROR init failed");
 
   instance = this;
 }
@@ -73,10 +73,10 @@ void WebInterface::wifiCheckConnectionOrReconnect()
   if (WiFi.isConnected())
     return;
   
-  Serial.println("WIFI down .. attempting connect!");
+  log_w("WIFI down .. attempting connect!");
   wifiReconnect();
   
-  Serial.println("WIFI reconnecting .. waiting for network");
+  log_i("WIFI reconnecting .. waiting for network");
   uint32_t trycount = 0;
   while (!WiFi.isConnected())
   {
@@ -84,18 +84,18 @@ void WebInterface::wifiCheckConnectionOrReconnect()
     if (trycount > 150)  // 15s
     {
       trycount = 0;
-      Serial.println("WIFI still down .. attempting reconnect!");
+      log_d("WIFI still down .. attempting reconnect!");
       wifiReconnect();
     }
     vTaskDelay(pdMS_TO_TICKS(100));
   }
-  Serial.println("WIFI up again!");
+  log_i("WIFI up again!");
 }
 
 // replaces placeholder with values in static html
 static String processor_static(const String& var)
 {
-  Serial.println("processor_static var: " + var);
+  log_d("processor_static var: %s", var);
   
   return String();
 }
@@ -103,7 +103,7 @@ static String processor_static(const String& var)
 // replaces placeholder with values in xml file
 static String processor_xml(const String& var)
 {
-  Serial.println("processor_xml var: " + var);
+  log_d("processor_xml var: %s", var);
 
   return String();
 }
@@ -115,42 +115,25 @@ void WebInterface::task_http_wrapper(void *arg)
 }
 void WebInterface::task_http()
 {
-  Serial.print("Attempting to connect to SSID: ");
-  Serial.println(WIFISSID);
+  log_d("Attempting to connect to SSID: %s", WIFISSID);
 
   wifiCheckConnectionOrReconnect();
 
-  Serial.println("WiFi connected");
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
+  log_i("WiFi connected - IP address: %s", WiFi.localIP().toString());
 
   // be reachable under hostname.local
   if (!MDNS.begin(HOSTNAME))
-    Serial.println("Error setting up MDNS responder!");
+    log_e("Error setting up MDNS responder!");
   else
-    Serial.println("mDNS responder started");
-  
-  // for (uint8_t i = 0; i < 3; i++)
-  //   Serial.println("mDNS host " + String(i) + ": " + MDNS.hostname(i));
+    log_i("mDNS responder started");
   
   server_.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request){
-    Serial.println("Received favicon get");
+    log_d("Received favicon get");
     request->send(SPIFFS, "/favicon.png", "image/png");
   });
 
   // FIXME: this crashes?? SPIFFS seems to conflict with hardware timers!
   server_.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
-  // server_.serveStatic("/view.js", SPIFFS, "/view.js");
-
-  // this alternative just crashes less/same :(
-  // route for root / web page
-  // server_.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-  //   request->send(SPIFFS, "/index.html", String(), false, processor_static);
-  // });
-  // it works with the html in flash
-  // server_.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-  //   request->send(SPIFFS, "/index.html");
-  // });
 
   server_.on("/view.js", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send(SPIFFS, "/view.js", "text/javascript");
@@ -176,21 +159,21 @@ void WebInterface::task_http()
   // route to on_mode
   server_.on("/on_mode", HTTP_POST, [this](AsyncWebServerRequest *request) {
     request->send(200);
-    Serial.println("Received on_mode");
+    log_d("Received on_mode");
     this->alarm_control_->setOnMode();
   });
 
   // route to off_mode
   server_.on("/off_mode", HTTP_POST, [this](AsyncWebServerRequest *request) {
     request->send(200);
-    Serial.println("Received off_mode");
+    log_d("Received off_mode");
     this->alarm_control_->setOffMode();
   });
 
   // route to pwm_mode
   server_.on("/alarm_mode", HTTP_POST, [this](AsyncWebServerRequest *request) {
     request->send(200);
-    Serial.println("Received alarm_mode");
+    log_d("Received alarm_mode");
     this->alarm_control_->setAlarmMode();
   });
 
@@ -254,7 +237,7 @@ void WebInterface::task_http()
       String(this->alarm_control_->getDutyMin());
 
     request->send_P(200, "text/plain", params.c_str());
-    Serial.println("send parameters: " + params);
+    log_d("send parameters: %s", params.c_str());
   });
 
   // route to reset
@@ -304,21 +287,21 @@ void WebInterface::task_ota()
 
       // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
       // SPIFFS.end();
-      Serial.println("Start updating " + type);
+      log_i("Start updating %s", type);
     })
     .onEnd([]() {
-      Serial.println("\nEnd of OTA ..");
+      log_i("\nEnd of OTA ..");
     })
     .onProgress([](unsigned int progress, unsigned int total) {
-      Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+      log_d("Progress: %u%%", (progress / (total / 100)));
     })
     .onError([](ota_error_t error) {
-      Serial.printf("Error[%u]: ", error);
-      if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
-      else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
-      else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
-      else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
-      else if (error == OTA_END_ERROR) Serial.println("End Failed");
+      log_e("Error[%u]: ", error);
+      if (error == OTA_AUTH_ERROR) log_e("Auth Failed");
+      else if (error == OTA_BEGIN_ERROR) log_e("Begin Failed");
+      else if (error == OTA_CONNECT_ERROR) log_e("Connect Failed");
+      else if (error == OTA_RECEIVE_ERROR) log_e("Receive Failed");
+      else if (error == OTA_END_ERROR) log_e("End Failed");
     });
 
   ArduinoOTA.setHostname(HOSTNAME);

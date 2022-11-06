@@ -17,14 +17,14 @@ LEDControl::LEDControl(uint8_t ctrl_pin_1, mcpwm_unit_t mcpwm_unit_id) :
   preferences_lock.lock();
   this->preferences_->begin("ledctrl");
 
-  this->frequency_hz_ = this->preferences_->getUInt("frequency", 1000);
+  this->frequency_hz_ = this->preferences_->getUInt("frequency", 0);
   if (this->frequency_hz_ <= 100 || this->frequency_hz_ >= 10000)
   {
     this->frequency_hz_ = 1000;
     this->preferences_->putUInt("frequency", this->frequency_hz_);
   }
 
-  this->duty_percent_ = this->preferences_->getFloat("duty", 50.0f);
+  this->duty_percent_ = this->preferences_->getFloat("duty", 0.0f);
   if (this->duty_percent_ <= 1.0f || this->duty_percent_ > 99.0f)
   {
     this->duty_percent_ = 50.0f;
@@ -34,7 +34,7 @@ LEDControl::LEDControl(uint8_t ctrl_pin_1, mcpwm_unit_t mcpwm_unit_id) :
   this->preferences_->end();
   preferences_lock.unlock();
   
-  Serial.println("LEDctrl: init mcpwm driver");
+  log_d("init mcpwm driver");
   this->updateTiming(this->frequency_hz_, this->duty_percent_);
 }
 
@@ -60,15 +60,15 @@ void LEDControl::updateTiming(uint32_t frequency_hz, float duty_percent)
   }
   else
   {
-    Serial.printf("LEDctrl: ERR Invalid frequency: %u  duty-cycle: %f\n", frequency_hz, duty_percent);
+    log_e("ERR Invalid frequency: %u  duty-cycle: %f", frequency_hz, duty_percent);
     return;
   }
 
   this->preferences_->end();
   preferences_lock.unlock();
 
-  Serial.printf("LEDctrl: Setting frequency: %u\n", this->frequency_hz_);
-  Serial.printf("LEDctrl: Setting duty-cycle: %f\n", this->duty_percent_);
+  log_i("Setting frequency: %u", this->frequency_hz_);
+  log_i("Setting duty-cycle: %f", this->duty_percent_);
 
   mcpwm_gpio_init(this->mcpwm_unit_, MCPWM0A, this->ctrl_pin_1);
 
