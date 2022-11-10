@@ -282,10 +282,11 @@ void WebInterface::task_ota()
       else // U_SPIFFS
         type = "filesystem";
 
-      // TODO: stop everything (esp. webserver)
-
+      // stop everything (esp. webserver)
+      instance->server_.end();
       // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
-      // SPIFFS.end();
+      SPIFFS.end();
+
       log_i("Start updating %s", type);
     })
     .onEnd([]() {
