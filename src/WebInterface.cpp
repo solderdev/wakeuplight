@@ -44,6 +44,9 @@ WebInterface::WebInterface(AlarmControl *alarm_control) :
     return;
   }
 
+  // disable Bluetooth
+  btStop();
+
   if (xTaskCreate(&WebInterface::task_http_wrapper, "task_http", TaskConfig::WiFi_http_stacksize, this, TaskConfig::WiFi_http_priority, &task_handle_http_) != pdPASS)
     log_e("WebInterface ERROR init failed");
 
@@ -63,8 +66,8 @@ void WebInterface::wifiReconnect()
   WiFi.setHostname(HOSTNAME);
   vTaskDelay(pdMS_TO_TICKS(1000));
   WiFi.begin(WIFISSID, WIFIPW);
-  WiFi.setSleep(false);
-  WiFi.setTxPower(WIFI_POWER_19_5dBm);
+  WiFi.setSleep(true);
+  WiFi.setTxPower(WIFI_POWER_MINUS_1dBm);  // WIFI_POWER_19_5dBm
 }
 
 void WebInterface::wifiCheckConnectionOrReconnect()
