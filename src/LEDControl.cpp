@@ -11,28 +11,8 @@ LEDControl::LEDControl(uint8_t ctrl_pin_1, mcpwm_unit_t mcpwm_unit_id) :
   mcpwm_unit_(mcpwm_unit_id), 
   ctrl_pin_1(ctrl_pin_1)
 {
-  // flash storage for variables
-  this->preferences_ = new Preferences();
-  // load saved values
-  preferences_lock.lock();
-  this->preferences_->begin("ledctrl");
-
-  this->frequency_hz_ = this->preferences_->getUInt("frequency", 0);
-  if (this->frequency_hz_ <= 100 || this->frequency_hz_ >= 10000)
-  {
-    this->frequency_hz_ = 1000;
-    this->preferences_->putUInt("frequency", this->frequency_hz_);
-  }
-
-  this->duty_percent_ = this->preferences_->getFloat("duty", 0.0f);
-  if (this->duty_percent_ <= 1.0f || this->duty_percent_ > 99.0f)
-  {
-    this->duty_percent_ = 50.0f;
-    this->preferences_->putFloat("duty", this->duty_percent_);
-  }
-
-  this->preferences_->end();
-  preferences_lock.unlock();
+  this->frequency_hz_ = 20000;
+  this->duty_percent_ = 50.0f;
   
   log_d("init mcpwm driver");
   this->updateTiming(this->frequency_hz_, this->duty_percent_);
@@ -40,21 +20,9 @@ LEDControl::LEDControl(uint8_t ctrl_pin_1, mcpwm_unit_t mcpwm_unit_id) :
 
 void LEDControl::updateTiming(uint32_t frequency_hz, float duty_percent)
 {
-  preferences_lock.lock();
-  this->preferences_->begin("ledctrl");
-
-  if (frequency_hz > 100 && frequency_hz < 10000 &&
+  if (frequency_hz > 100 && frequency_hz < 30000 &&
       duty_percent > 1.0 && duty_percent <= 99.0)
   {
-    if (this->frequency_hz_ != frequency_hz)
-    {
-      this->preferences_->putUInt("frequency", frequency_hz);
-    }
-    if (this->duty_percent_ != duty_percent)
-    {
-      this->preferences_->putFloat("duty", duty_percent);
-    }
-
     this->frequency_hz_ = frequency_hz;
     this->duty_percent_ = duty_percent;
   }
@@ -63,9 +31,6 @@ void LEDControl::updateTiming(uint32_t frequency_hz, float duty_percent)
     log_e("ERR Invalid frequency: %u  duty-cycle: %f", frequency_hz, duty_percent);
     return;
   }
-
-  this->preferences_->end();
-  preferences_lock.unlock();
 
   log_i("Setting frequency: %u", this->frequency_hz_);
   log_i("Setting duty-cycle: %f", this->duty_percent_);

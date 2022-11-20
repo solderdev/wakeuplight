@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Arduino.h>
-#include <Preferences.h>
 #include "driver/mcpwm.h"
 
 class LEDControl
@@ -27,5 +26,4 @@ private:
   uint32_t frequency_hz_;
   float duty_percent_;
   uint8_t mode = 2; //on == 0, off == 1, pwm == 2
-  Preferences *preferences_;
 };
