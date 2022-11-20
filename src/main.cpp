@@ -29,6 +29,10 @@ unsigned long IRAM_ATTR systime_ms()
 
 void setup()
 {
+  // TODO: evaluate!
+  setCpuFrequencyMhz(80);
+  systime_init();
+
   esp_log_level_set("*", ESP_LOG_DEBUG);
 
   // COMPLETELY ERASE NVS
@@ -39,7 +43,8 @@ void setup()
   Serial.begin(115200);
   Serial.setDebugOutput(true);
   delay(2000);
-  Serial.println("Hi there! Booting now..");
+  log_d("Hi there! Booting now..");
+  log_d("CPU clock: %u MHz / using systime multiplier %u with ApbFrequency %u", getCpuFrequencyMhz(), systime_multiplier, getApbFrequency());
   
   led_control = new LEDControl(Pins::pwm1, MCPWM_UNIT_0);
 
@@ -48,7 +53,6 @@ void setup()
   web_interface = new WebInterface(alarm_control);
 
   configTime(3600, 3600, "time.tugraz.at");
-  systime_init();
 }
 
 void loop()
