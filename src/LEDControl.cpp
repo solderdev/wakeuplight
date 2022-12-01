@@ -38,7 +38,7 @@ void LEDControl::updateTiming(uint32_t frequency_hz, float duty_percent)
   mcpwm_gpio_init(this->mcpwm_unit_, MCPWM0A, this->ctrl_pin_1);
 
   // set PWM-mode
-  this->mode = 2;
+  this->mode = LEDMODE_PWM;
 
   mcpwm_config_t pwm_config = {
       .frequency = this->frequency_hz_,
@@ -49,7 +49,7 @@ void LEDControl::updateTiming(uint32_t frequency_hz, float duty_percent)
   };
   mcpwm_init(this->mcpwm_unit_, MCPWM_TIMER_0, &pwm_config);
   
-  mcpwm_set_duty(this->mcpwm_unit_, MCPWM_TIMER_0, MCPWM_GEN_A, 100.0f - this->duty_percent_);
+  mcpwm_set_duty(this->mcpwm_unit_, MCPWM_TIMER_0, MCPWM_GEN_A, this->duty_percent_);  // 100.0f - 
 
   mcpwm_set_duty_type(this->mcpwm_unit_, MCPWM_TIMER_0, MCPWM_GEN_A, MCPWM_DUTY_MODE_0);
 
@@ -67,21 +67,21 @@ float LEDControl::getDutyPercent(void)
   return this->duty_percent_;
 }
 
-uint8_t LEDControl::getMode(void)
+LEDControl::LEDMode_t LEDControl::getMode(void)
 {
   return this->mode;
 }
 
 void LEDControl::setOnMode(void)
 {
-  this->mode = 0;
-  mcpwm_set_signal_low(this->mcpwm_unit_, MCPWM_TIMER_0, MCPWM_GEN_A);
+  this->mode = LEDMODE_ON;
+  mcpwm_set_signal_high(this->mcpwm_unit_, MCPWM_TIMER_0, MCPWM_GEN_A);
 }
 
 void LEDControl::setOffMode(void)
 {
-  this->mode = 1;
-  mcpwm_set_signal_high(this->mcpwm_unit_, MCPWM_TIMER_0, MCPWM_GEN_A);
+  this->mode = LEDMODE_OFF;
+  mcpwm_set_signal_low(this->mcpwm_unit_, MCPWM_TIMER_0, MCPWM_GEN_A);
 }
 
 void LEDControl::setPwmMode(void)

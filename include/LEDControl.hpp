@@ -6,6 +6,12 @@
 class LEDControl
 {
 public:
+  typedef enum {
+    LEDMODE_ON = 0,
+    LEDMODE_OFF = 1,
+    LEDMODE_PWM = 2
+  } LEDMode_t;
+
   LEDControl(uint8_t ctrl_pin_1, mcpwm_unit_t mcpwm_unit_id);
   LEDControl(LEDControl const&) = delete;
   void operator=(LEDControl const&)  = delete;
@@ -13,7 +19,7 @@ public:
   void updateTiming(uint32_t frequency_hz, float duty_percent);
   uint32_t getFrequencyHz(void);
   float getDutyPercent(void);
-  uint8_t getMode(void);
+  LEDMode_t getMode(void);
   void setOnMode(void);
   void setOffMode(void);
   void setPwmMode(void);
@@ -25,5 +31,5 @@ private:
   mcpwm_unit_t mcpwm_unit_;
   uint32_t frequency_hz_;
   float duty_percent_;
-  uint8_t mode = 2; //on == 0, off == 1, pwm == 2
+  LEDMode_t mode = LEDMODE_PWM; //on == 0, off == 1, pwm == 2
 };

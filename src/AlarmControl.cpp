@@ -69,7 +69,7 @@ float AlarmControl::getDutyMin(void)
   return this->duty_min_;
 }
 
-uint8_t AlarmControl::getMode(void)
+LEDControl::LEDMode_t AlarmControl::getMode(void)
 {
   return this->led_control_->getMode();
 }

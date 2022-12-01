@@ -15,7 +15,7 @@ public:
   uint32_t getFadeMinutes(void);
   float getDutyMax(void);
   float getDutyMin(void);
-  uint8_t getMode(void);
+  LEDControl::LEDMode_t getMode(void);
   void setOnMode(void);
   void setOffMode(void);
   void setAlarmMode(void);
