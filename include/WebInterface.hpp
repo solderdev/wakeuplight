@@ -11,7 +11,9 @@
 class WebInterface
 {
 public:
-  WebInterface(AlarmControl *alarm_control);
+  explicit WebInterface(AlarmControl *alarm_control);
+  WebInterface(WebInterface const&) = delete;
+  void operator=(WebInterface const&)  = delete;
 
   AlarmControl* getAlarmControl();
 

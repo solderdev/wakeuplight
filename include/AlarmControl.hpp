@@ -7,7 +7,7 @@
 class AlarmControl
 {
 public:
-  AlarmControl(LEDControl *led_control);
+  explicit AlarmControl(LEDControl *led_control);
   AlarmControl(AlarmControl const&) = delete;
   void operator=(AlarmControl const&)  = delete;
 
