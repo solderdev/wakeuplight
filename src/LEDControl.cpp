@@ -21,7 +21,7 @@ LEDControl::LEDControl(uint8_t ctrl_pin_1, mcpwm_unit_t mcpwm_unit_id) :
 void LEDControl::updateTiming(uint32_t frequency_hz, float duty_percent)
 {
   if (frequency_hz > 100 && frequency_hz < 30000 &&
-      duty_percent > 1.0 && duty_percent <= 99.0)
+      duty_percent > 0.0 && duty_percent < 100.0)
   {
     this->frequency_hz_ = frequency_hz;
     this->duty_percent_ = duty_percent;

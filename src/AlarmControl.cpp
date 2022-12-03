@@ -182,7 +182,9 @@ void AlarmControl::task_alarm_wrapper(void *arg)
 void AlarmControl::task_alarm()
 {
   struct tm timeinfo;
+  struct tm timeinfo_alarm;
   float duty_calc;
+  int minutes_diff;
   
   while (1)
   {
@@ -199,18 +201,46 @@ void AlarmControl::task_alarm()
         log_w("Failed to obtain time");
         break;
       }
-      //   log_d("%04u-%02u-%02u %02u:%02u:%02u", 
-      //         1900 + timeinfo.tm_year, timeinfo.tm_mon, timeinfo.tm_mday, 
-      //         timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
 
-      // check if we are outside alarm-fade time
-      // TODO
-      this->led_control_->setOffMode();
+      // if we are on a weekend and option is off --> disable
+      if ((timeinfo.tm_wday == 6 || timeinfo.tm_wday == 0) && this->alarm_weekend_ == false)
+      {
+        this->led_control_->setOffMode();
+        break;
+      }
 
-      // if we are inside alarm time: calculate fade duty
-      // TODO
-      this->led_control_->setDutyCycle(duty_calc);
-      break;
+      // copy "now" for calculations
+      memcpy(&timeinfo_alarm, &timeinfo, sizeof(timeinfo));
+      timeinfo_alarm.tm_hour = String(this->alarm_time_).substring(0, 2).toInt();
+      timeinfo_alarm.tm_min = String(this->alarm_time_).substring(3, 5).toInt();
+      timeinfo_alarm.tm_sec = 0;
+
+      // calculate distance to alarm time
+      minutes_diff = difftime(mktime(&timeinfo), mktime(&timeinfo_alarm)) / 60;
+
+      // uint8_t start_h = String(this->alarm_time_).substring(0, 2).toInt();
+      // uint8_t start_m = String(this->alarm_time_).substring(3, 5).toInt();
+      // uint8_t end_h = (uint8_t)(((uint32_t)(start_h) * 60 + start_m + this->fade_minutes_) / 60) % 24;
+      // uint8_t end_m = (start_m + this->fade_minutes_) % 60;
+
+      if (minutes_diff >= 0 && minutes_diff < this->fade_minutes_)
+      {
+        // if we are inside alarm time: calculate current fade duty cycle
+        duty_calc = minutes_diff * 100 / this->fade_minutes_;
+        if (duty_calc >= 100)
+          this->led_control_->setOnMode();
+        else if (duty_calc > 0.0)
+          this->led_control_->setDutyCycle(duty_calc);
+        else
+          this->led_control_->setOffMode();
+        break;
+      }
+      else
+      {
+        // we are outside of fading time (< 0 is too early)
+        this->led_control_->setOffMode();
+        break;
+      }
     
     case ALARMMODE_ALARM_OFF:
       // alarm is off
