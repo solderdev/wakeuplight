@@ -129,9 +129,52 @@ void WebInterface::task_http()
   else
     log_i("mDNS responder started");
   
+  // https://realfavicongenerator.net
   server_.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request){
     log_d("Received favicon get");
-    request->send(SPIFFS, "/favicon.png", "image/png");
+    request->send(SPIFFS, "/favicon.ico", "image/svg+xml");
+  });
+  server_.on("/apple-touch-icon.png", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/apple-touch-icon.png", "image/png");
+  });
+  server_.on("/apple-touch-icon-60x60.png", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/apple-touch-icon-60x60.png", "image/png");
+  });
+  server_.on("/apple-touch-icon-76x76.png", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/apple-touch-icon-76x76.png", "image/png");
+  });
+  server_.on("/apple-touch-icon-120x120.png", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/apple-touch-icon-120x120.png", "image/png");
+  });
+  server_.on("/apple-touch-icon-152x152.png", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/apple-touch-icon-152x152.png", "image/png");
+  });
+  server_.on("/apple-touch-icon-180x180.png", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/apple-touch-icon-180x180.png", "image/png");
+  });
+  server_.on("/favicon-32x32.png", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/favicon-32x32.png", "image/png");
+  });
+  server_.on("/favicon-16x16.png", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/favicon-16x16.png", "image/png");
+  });
+  server_.on("/site.webmanifest", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/site.webmanifest", "text/plain");
+  });
+  server_.on("/safari-pinned-tab.svg", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/safari-pinned-tab.svg", "image/svg+xml");
+  });
+  server_.on("/android-chrome-192x192.png", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/android-chrome-192x192.png", "image/png");
+  });
+  server_.on("/android-chrome-512x512.png", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/android-chrome-512x512.png", "image/png");
+  });
+  server_.on("/mstile-150x150.png", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/mstile-150x150.png", "image/png");
+  });
+  server_.on("/browserconfig.xml", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/browserconfig.xml", "text/xml");
   });
 
   // FIXME: this crashes?? SPIFFS seems to conflict with hardware timers!
