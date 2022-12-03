@@ -6,15 +6,20 @@ class View
     document.getElementById('on_mode_button_id').addEventListener(
         "click", event => this.onButtonClick(event, "on_mode"), true);
     
-    document.getElementById('off_mode_button_id').addEventListener(
-        "click", event => this.onButtonClick(event, "off_mode"), true);
+    document.getElementById('alarm_off_button_id').addEventListener(
+        "click", event => this.onButtonClick(event, "alarm_off"), true);
 
-    document.getElementById('alarm_mode_button_id').addEventListener(
-        "click", event => this.onButtonClick(event, "alarm_mode"), true);
+    document.getElementById('alarm_on_button_id').addEventListener(
+        "click", event => this.onButtonClick(event, "alarm_on"), true);
 
     document.getElementById('alarm_time_form_id').addEventListener(
         "change", event => this.onSubmitAlarmTime(event), true);
     document.getElementById('alarm_time_form_id').addEventListener(
+        "submit", event => this.onSubmitPreventDefault(event), true);
+
+    document.getElementById('alarm_weekend_form_id').addEventListener(
+        "change", event => this.onSubmitAlarmTime(event), true);
+    document.getElementById('alarm_weekend_form_id').addEventListener(
         "submit", event => this.onSubmitPreventDefault(event), true);
 
     document.getElementById('fade_minutes_form_id').addEventListener(
@@ -48,6 +53,7 @@ class View
 
   bindOnButtonClickCB(callback) { this.onButtonClickCB = callback }
   bindAlarmTimeSubmitCB(callback) { this.alarmTimeSubmitCB = callback }
+  bindAlarmWeekendSubmitCB(callback) { this.alarmWeekendSubmitCB = callback }
   bindFadeMinutesSubmitCB(callback) { this.fadeMinutesSubmitCB = callback }
   bindDutyMaxSubmitCB(callback) { this.dutyMaxSubmitCB = callback }
   bindDutyMinSubmitCB(callback) { this.dutyMinSubmitCB = callback }
@@ -57,6 +63,7 @@ class View
     console.log("View:onModelDataChanged()")
 
     document.getElementById('alarm_time_input_id').value = this.model.getAlarmTime()
+    document.getElementById('alarm_weekend_input_id').value = this.model.getAlarmWeekend()
     document.getElementById('fade_minutes_input_id').value = this.model.getFadeMinutes()
     document.getElementById('mode_id').innerHTML = this.model.getModeName()
     document.getElementById('duty_max_input_id').value = this.model.getDutyMax()
@@ -84,6 +91,18 @@ class View
     console.log("Alarm Time: " + alarm_time.toString())
 
     this.alarmTimeSubmitCB(alarm_time)
+  }
+
+  onSubmitAlarmWeekend(event)
+  {
+    console.log("View:onSubmitAlarmWeekend()")
+    event.preventDefault()
+
+    let alarm_weekend = document.getElementById('alarm_weekend_input_id').value
+
+    console.log("Alarm Weekend: " + alarm_weekend.toString())
+
+    this.alarmWeekendSubmitCB(alarm_weekend)
   }
 
   onSubmitFadeMinutes(event)

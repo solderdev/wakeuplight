@@ -2,7 +2,8 @@
 class Model {
     constructor() 
     {
-        this.alarm_time = 0  // TODO
+        this.alarm_time = "11:11"
+        this.alarm_weekend = false
         this.fade_minutes = 20
         this.mode = 2
         this.duty_max = 99.0
@@ -25,15 +26,17 @@ class Model {
         return "http://" + this.host_ip + "/"
     }
 
-    setParameters(alarm_time, fade_minutes, mode, duty_max, duty_min)
+    setParameters(alarm_time, alarm_weekend, fade_minutes, mode, duty_max, duty_min)
     {
         console.log('setParameters: alarm_time=' + alarm_time + 
+                    'alarm_weekend=' + alarm_weekend + 
                     'fade_minutes=' + fade_minutes + 
                     'mode=' + mode + 
                     'duty_max=' + duty_max + 
                     'duty_min=' + duty_min)
 
         this.alarm_time = alarm_time
+        this.alarm_weekend = alarm_weekend
         this.fade_minutes = fade_minutes
         this.mode = mode
         this.duty_max = duty_max
@@ -44,6 +47,12 @@ class Model {
     setAlarmTime(alarm_time)
     {
         this.alarm_time = alarm_time
+        this.dataChangedCB()
+    }
+
+    setAlarmWeekend(alarm_weekend)
+    {
+        this.alarm_weekend = alarm_weekend
         this.dataChangedCB()
     }
 
@@ -58,6 +67,11 @@ class Model {
         return this.alarm_time
     }
 
+    getAlarmWeekend()
+    {
+        return this.alarm_weekend
+    }
+
     getFadeMinutes()
     {
         return this.fade_minutes
@@ -65,9 +79,11 @@ class Model {
 
     getModeName()
     {
-        if(this.mode == 0) return "ON Mode"
-        if(this.mode == 1) return "OFF Mode"
-        return "Alarm Mode"
+        // see AlarmMode_t
+        if(this.mode == 0) return "Forced ON"
+        if(this.mode == 1) return "Alarm OFF"
+        if(this.mode == 2) return "Alarm ON"
+        return "undefined"
     }
 
     getDutyMax()

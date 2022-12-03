@@ -140,15 +140,12 @@ void WebInterface::task_http()
   server_.on("/view.js", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send(SPIFFS, "/view.js", "text/javascript");
   });
-
   server_.on("/model.js", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send(SPIFFS, "/model.js", "text/javascript");
   });
-
   server_.on("/controller.js", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send(SPIFFS, "/controller.js", "text/javascript");
   });
-
   server_.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send(SPIFFS, "/style.css", "text/css");
   });
@@ -165,18 +162,18 @@ void WebInterface::task_http()
     this->alarm_control_->setOnMode();
   });
 
-  // route to off_mode
-  server_.on("/off_mode", HTTP_POST, [this](AsyncWebServerRequest *request) {
+  // route to alarm_off
+  server_.on("/alarm_off", HTTP_POST, [this](AsyncWebServerRequest *request) {
     request->send(200);
-    log_d("Received off_mode");
-    this->alarm_control_->setOffMode();
+    log_d("Received alarm_off");
+    this->alarm_control_->setAlarmOFF();
   });
 
   // route to pwm_mode
-  server_.on("/alarm_mode", HTTP_POST, [this](AsyncWebServerRequest *request) {
+  server_.on("/alarm_on", HTTP_POST, [this](AsyncWebServerRequest *request) {
     request->send(200);
-    log_d("Received alarm_mode");
-    this->alarm_control_->setAlarmMode();
+    log_d("Received alarm_on");
+    this->alarm_control_->setAlarmON();
   });
 
   // route to set alarm time
@@ -232,7 +229,9 @@ void WebInterface::task_http()
   // route to load style.css file
   server_.on("/parameters", HTTP_GET, [this](AsyncWebServerRequest *request) {
     
-    String params = this->alarm_control_->getAlarmTime() + " " +
+    String params = 
+      this->alarm_control_->getAlarmTime() + " " +
+      String(this->alarm_control_->getAlarmWeekend()) + " " +  // TODO check what is actually sent here vs. controller.js:48
       String(this->alarm_control_->getFadeMinutes()) + " " + 
       String(this->alarm_control_->getMode()) + " " + 
       String(this->alarm_control_->getDutyMax()) + " " +

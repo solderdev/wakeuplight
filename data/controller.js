@@ -14,6 +14,7 @@ class Controller {
       //bind view callbacks
       this.view.bindOnButtonClickCB((name) => this.onOnMode(name))
       this.view.bindAlarmTimeSubmitCB((alarm_time) => this.onAlarmTime(alarm_time))
+      this.view.bindAlarmWeekendSubmitCB((alarm_weekend) => this.onAlarmWeekend(alarm_weekend))
       this.view.bindFadeMinutesSubmitCB((fade_minutes) => this.onFadeMinutes(fade_minutes))
       this.view.bindDutyMaxSubmitCB((duty_max) => this.onDutyMax(duty_max))
       this.view.bindDutyMinSubmitCB((duty_min) => this.onDutyMin(duty_min))
@@ -25,7 +26,7 @@ class Controller {
     {
         console.log("intervalUpdate")
 
-        // TODO: fetch time and display!
+        // TODO: fetch esp-32 time and display!
 
         setTimeout(() => {this.intervalUpdate();}, 1000);
     }
@@ -44,10 +45,11 @@ class Controller {
             let params = data.split(" ")
             this.model.setParameters(
                 params[0], 
-                parseInt(params[1]), 
+                params[1], 
                 parseInt(params[2]), 
-                parseFloat(params[3]), 
-                parseFloat(params[4]))
+                parseInt(params[3]), 
+                parseFloat(params[4]), 
+                parseFloat(params[5]))
         })
     }
 
@@ -112,8 +114,8 @@ class Controller {
 
         let endpoint = "on_mode"
 
-        if(name == "off_mode") endpoint = "off_mode"
-        if(name == "alarm_mode") endpoint = "alarm_mode"
+        if(name == "alarm_off") endpoint = "alarm_off"
+        if(name == "alarm_on") endpoint = "alarm_on"
 
         fetch(this.model.getHostURLHTTP() + endpoint, {
             method: 'POST',
