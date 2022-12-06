@@ -42,10 +42,11 @@ class Controller {
         })
         .then(response => response.text())
         .then(data => {
+            console.log('got Parameters: ' + data)
             let params = data.split(" ")
             this.model.setParameters(
                 params[0], 
-                params[1], 
+                JSON.parse(params[1]), // true / false
                 parseInt(params[2]), 
                 parseInt(params[3]), 
                 parseFloat(params[4]), 
@@ -61,6 +62,21 @@ class Controller {
             method: 'POST',
             headers: {'Content-Type': 'text/plain'},
             body: alarm_time.toString() + '\0',
+        })
+        .then(response => response.text())
+        .then(data => {
+            this.fetchParameters()
+        })
+    }
+
+    onAlarmWeekend(alarm_weekend)
+    {
+        console.log("Controller:onAlarmWeekend(" + alarm_weekend.toString() + ")")
+
+        fetch(this.model.getHostURLHTTP() + "set_alarm_weekend", {
+            method: 'POST',
+            headers: {'Content-Type': 'text/plain'},
+            body: alarm_weekend.toString() + '\0',
         })
         .then(response => response.text())
         .then(data => {
@@ -124,7 +140,7 @@ class Controller {
         })
         .then(response => response.text())
         .then(data => {
-            console.log(data.toString())
+            console.log("onOnMode got " + data.toString())
             this.fetchParameters()
         })
     }
@@ -132,6 +148,6 @@ class Controller {
 
 var app = new Controller(new Model(), new View());
 
-document.addEventListener('DOMContentLoaded', function() {
-        app.intervalUpdate();
-    }, false);
+// document.addEventListener('DOMContentLoaded', function() {
+//         app.intervalUpdate();
+//     }, false);
