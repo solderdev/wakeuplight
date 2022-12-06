@@ -16,9 +16,9 @@ class View
         "change", event => this.onSubmitAlarmTime(event), true);
     document.getElementById('alarm_time_form_id').addEventListener(
         "submit", event => this.onSubmitPreventDefault(event), true);
-
+ 
     document.getElementById('alarm_weekend_form_id').addEventListener(
-        "change", event => this.onSubmitAlarmTime(event), true);
+        "change", event => this.onSubmitAlarmWeekend(event), true);
     document.getElementById('alarm_weekend_form_id').addEventListener(
         "submit", event => this.onSubmitPreventDefault(event), true);
 
@@ -63,7 +63,7 @@ class View
     console.log("View:onModelDataChanged()")
 
     document.getElementById('alarm_time_input_id').value = this.model.getAlarmTime()
-    document.getElementById('alarm_weekend_input_id').value = this.model.getAlarmWeekend()
+    document.getElementById('alarm_weekend_input_id').checked = this.model.getAlarmWeekend()
     document.getElementById('fade_minutes_input_id').value = this.model.getFadeMinutes()
     document.getElementById('mode_id').innerHTML = this.model.getModeName()
     document.getElementById('duty_max_input_id').value = this.model.getDutyMax()
@@ -98,7 +98,7 @@ class View
     console.log("View:onSubmitAlarmWeekend()")
     event.preventDefault()
 
-    let alarm_weekend = document.getElementById('alarm_weekend_input_id').value
+    let alarm_weekend = document.getElementById('alarm_weekend_input_id').checked
 
     console.log("Alarm Weekend: " + alarm_weekend.toString())
 
