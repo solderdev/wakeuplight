@@ -10,7 +10,8 @@ public:
   typedef enum {
     ALARMMODE_FORCE_ON = 0,
     ALARMMODE_ALARM_ON = 1,
-    ALARMMODE_ALARM_OFF = 2
+    ALARMMODE_ALARM_OFF = 2,
+    ALARMMODE_LIMIT
   } AlarmMode_t;
 
   explicit AlarmControl(LEDControl *led_control);
@@ -24,6 +25,7 @@ public:
   float getDutyMin(void);
   AlarmMode_t getMode(void);
   void setOnMode(void);
+  void setMode(AlarmControl::AlarmMode_t mode);
   void setAlarmOFF(void);
   void setAlarmON(void);
   void setAlarmTime(String alarm_time);

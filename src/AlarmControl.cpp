@@ -46,11 +46,19 @@ AlarmControl::AlarmControl(LEDControl *led_control) :
     log_d("Setting default value for duty_min: %.2f", this->duty_min_);
   }
 
+  this->mode_ = (AlarmMode_t)(this->preferences_->getUChar("mode", ALARMMODE_ALARM_ON));
+  if ((uint8_t)(this->mode_) >= ALARMMODE_LIMIT)
+  {
+    this->mode_ = ALARMMODE_ALARM_ON;
+    this->preferences_->putUChar("mode", (uint8_t)(this->mode_));
+    log_d("Setting default value for mode: %u", this->mode_);
+  }
+
   this->preferences_->end();
   preferences_lock.unlock();
 
-  log_i("Initialized Alarm with: alarm_time_=%s fade_minutes_=%u duty_max_=%.2f duty_min_=%.2f", 
-        this->alarm_time_, this->fade_minutes_, this->duty_max_, this->duty_min_);
+  log_i("Initialized Alarm with: alarm_time_=%s alarm_weekend_=%s fade_minutes_=%u duty_max_=%.2f duty_min_=%.2f", 
+        this->alarm_time_, (this->alarm_weekend_)?"true":"false", this->fade_minutes_, this->duty_max_, this->duty_min_);
 
   if (xTaskCreate(&AlarmControl::task_alarm_wrapper, "task_alarm", TaskConfig::Alarm_stacksize, this, TaskConfig::Alarm_priority, &task_handle_alarm_) != pdPASS)
     log_e("Alarm ERROR task init failed");
@@ -63,7 +71,7 @@ String AlarmControl::getAlarmTime(void)
 
 bool AlarmControl::getAlarmWeekend(void)
 {
-  return String(this->alarm_weekend_);
+  return this->alarm_weekend_;
 }
 
 uint32_t AlarmControl::getFadeMinutes(void)
@@ -86,22 +94,37 @@ AlarmControl::AlarmMode_t AlarmControl::getMode(void)
   return this->mode_;
 }
 
+void AlarmControl::setMode(AlarmControl::AlarmMode_t mode)
+{
+  log_d("setMode %u", mode);
+
+  if (this->mode_ != mode)
+  {
+    preferences_lock.lock();
+    this->preferences_->begin("alarmctrl");
+    this->preferences_->putUChar("mode", (uint8_t)(mode));
+    this->preferences_->end();
+    preferences_lock.unlock();
+  }
+  this->mode_ = mode;
+}
+
 void AlarmControl::setOnMode(void)
 {
   log_d("setOnMode");
-  this->mode_ = ALARMMODE_FORCE_ON;
+  this->setMode(ALARMMODE_FORCE_ON);
 }
 
 void AlarmControl::setAlarmOFF(void)
 {
   log_d("setAlarmOFF");
-  this->mode_ = ALARMMODE_ALARM_OFF;
+  this->setMode(ALARMMODE_ALARM_OFF);
 }
 
 void AlarmControl::setAlarmON(void)
 {
   log_d("setAlarmON");
-  this->mode_ = ALARMMODE_ALARM_ON;
+  this->setMode(ALARMMODE_ALARM_ON);
 }
 
 void AlarmControl::setAlarmTime(String alarm_time)
@@ -199,6 +222,8 @@ void AlarmControl::task_alarm()
       if (!getLocalTime(&timeinfo, 0))
       {
         log_w("Failed to obtain time");
+        this->led_control_->setOffMode();
+        vTaskDelay(pdMS_TO_TICKS(1000));
         break;
       }
 
