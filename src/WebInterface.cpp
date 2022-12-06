@@ -121,7 +121,8 @@ void WebInterface::task_http()
 
   wifiCheckConnectionOrReconnect();
 
-  log_i("WiFi connected - IP address: %s", WiFi.localIP().toString());
+  IPAddress ip = WiFi.localIP();
+  log_i("WiFi connected - IP address: %u.%u.%u.%u", ip[0], ip[1], ip[2], ip[3]);
 
   // be reachable under hostname.local
   if (!MDNS.begin(HOSTNAME))
