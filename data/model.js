@@ -29,11 +29,11 @@ class Model {
     setParameters(alarm_time, alarm_weekend, fade_minutes, mode, duty_max, duty_min)
     {
         console.log('setParameters: alarm_time=' + alarm_time + 
-                    'alarm_weekend=' + alarm_weekend + 
-                    'fade_minutes=' + fade_minutes + 
-                    'mode=' + mode + 
-                    'duty_max=' + duty_max + 
-                    'duty_min=' + duty_min)
+                    ' alarm_weekend=' + alarm_weekend + 
+                    ' fade_minutes=' + fade_minutes + 
+                    ' mode=' + mode + 
+                    ' duty_max=' + duty_max + 
+                    ' duty_min=' + duty_min)
 
         this.alarm_time = alarm_time
         this.alarm_weekend = alarm_weekend
@@ -81,8 +81,8 @@ class Model {
     {
         // see AlarmMode_t
         if(this.mode == 0) return "Forced ON"
-        if(this.mode == 1) return "Alarm OFF"
-        if(this.mode == 2) return "Alarm ON"
+        if(this.mode == 1) return "Alarm ON"
+        if(this.mode == 2) return "Alarm OFF "
         return "undefined"
     }
 
