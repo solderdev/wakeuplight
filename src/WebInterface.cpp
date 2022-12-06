@@ -230,6 +230,16 @@ void WebInterface::task_http()
       request->send_P(200, "text/plain", String(this->alarm_control_->getAlarmTime()).c_str());
   });
 
+  // route to set alarm weekend
+  server_.on("/set_alarm_weekend", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, 
+    [this](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
+      
+      bool alarm_weekend = strncmp((const char*)(data), "true", len) == 0;
+      this->alarm_control_->setAlarmWeekend(alarm_weekend);
+ 
+      request->send_P(200, "text/plain", String(this->alarm_control_->getAlarmTime()).c_str());
+  });
+
   // route to set duty cycle
   server_.on("/set_fade_minutes", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, 
     [this](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
@@ -272,10 +282,12 @@ void WebInterface::task_http()
 
   // route to load style.css file
   server_.on("/parameters", HTTP_GET, [this](AsyncWebServerRequest *request) {
-    
+
+    String al_we = (this->alarm_control_->getAlarmWeekend())?String("true"):String("false");
+
     String params = 
       this->alarm_control_->getAlarmTime() + " " +
-      String(this->alarm_control_->getAlarmWeekend()) + " " +  // TODO check what is actually sent here vs. controller.js:48
+      al_we + " " +  // TODO check what is actually sent here vs. controller.js:48
       String(this->alarm_control_->getFadeMinutes()) + " " + 
       String(this->alarm_control_->getMode()) + " " + 
       String(this->alarm_control_->getDutyMax()) + " " +
