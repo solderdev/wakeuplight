@@ -237,7 +237,8 @@ void WebInterface::task_http()
       bool alarm_weekend = strncmp((const char*)(data), "true", len) == 0;
       this->alarm_control_->setAlarmWeekend(alarm_weekend);
  
-      request->send_P(200, "text/plain", String(this->alarm_control_->getAlarmTime()).c_str());
+      String al_we = (this->alarm_control_->getAlarmWeekend())?String("true"):String("false");
+      request->send_P(200, "text/plain", al_we.c_str());
   });
 
   // route to set duty cycle
@@ -282,6 +283,8 @@ void WebInterface::task_http()
 
   // route to load style.css file
   server_.on("/parameters", HTTP_GET, [this](AsyncWebServerRequest *request) {
+
+    log_d("Received parameters req");
 
     String al_we = (this->alarm_control_->getAlarmWeekend())?String("true"):String("false");
 
