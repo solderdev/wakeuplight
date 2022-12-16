@@ -29,8 +29,7 @@ unsigned long IRAM_ATTR systime_ms()
 
 void setup()
 {
-  // TODO: evaluate!
-  setCpuFrequencyMhz(80);
+  // setCpuFrequencyMhz(80);
   systime_init();
 
   esp_log_level_set("*", ESP_LOG_DEBUG);
