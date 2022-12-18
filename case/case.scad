@@ -8,7 +8,7 @@ PCB_antenna_y = 17.9;  // antenna width
 PCB_Y = 28.2;
 PCB_Z = 1.65;
 
-PCB_z_space = 5; // extra space for top components
+PCB_z_space = 4; // extra space for top components
 
 PIN_dist = 25.4;
 PIN_spacing = 2.54;
@@ -16,10 +16,10 @@ PIN_num = 19;  // on each side
 PIN_dim = [0.64, 0.64, 6+2.7];
 PIN_socket_height = PIN_dim[2]/2;
 
+// centered on top of PCB
 USB_width = 7.8;
 USB_height = 2.9;
-// centered on top of PCB
-USB_con_width = 10.5;
+USB_con_width = 11;
 USB_con_height = 8.4;
 
 LED_strip_width = 8.0 + 0.5;
@@ -28,17 +28,17 @@ LED_strip_height = 1.5;
 WALL = 1.2;
 WALL_tol = 0.25;
 
-BOT_height = 10;
+BOT_height = WALL + PIN_dim[2] + PCB_Z;
 BOT_x_outside = WALL*2 + WALL_tol*2 + PCB_X + PCB_X_antenna;
 BOT_y_outside = WALL*2 + WALL_tol*2 + PCB_Y;
 
-TOP_height = 17;
+TOP_height = WALL + PCB_z_space + PCB_Z + PIN_dim[2] + 1;
 TOP_x_outside = WALL*2 + WALL_tol*2 + BOT_x_outside;
 TOP_y_outside = WALL*2 + WALL_tol*2 + BOT_y_outside;
 
 LID_ridge_d = 1.6;
 LID_ridge_d_hole = 2;
-LID_ridge_z_off = -BOT_height + 2;  //BOT_height/2 - WALL - PIN_dim[2];
+LID_ridge_z_off = -PIN_dim[2] + 1;  //BOT_height/2 - WALL - PIN_dim[2];
 LID_ridge_cutout = 20;
 
 module dummy()
@@ -64,7 +64,7 @@ module usb_cutout()
 {
   // USB cutout
   translate([0, 0, PCB_Z + USB_height/2])
-    cube([20, USB_con_width, USB_con_height], anchor=RIGHT);
+    cuboid([20, USB_con_width, USB_con_height], anchor=RIGHT, rounding=1, edges="X", except=TOP);
 }
 
 module pin_holes()
@@ -164,14 +164,13 @@ module case_top()
 }
 
 
-
-*%dummy();
+%dummy();
 
 
 difference()
 {
-//  case_top();
-//  translate([70, 0, 0])
+  case_top();
+//  translate([90, 0, 0])
 //    cube([100, 100, 100], center=true);
 }
 
