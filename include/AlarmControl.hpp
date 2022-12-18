@@ -40,10 +40,17 @@ private:
   LEDControl *led_control_;
   Preferences *preferences_;
   char alarm_time_[10]; // TODO check max size
+  char alarm_time_nvm_[10]; // TODO check max size
   bool alarm_weekend_;
+  bool alarm_weekend_nvm_;
   uint32_t fade_minutes_;
+  uint32_t fade_minutes_nvm_;
   float duty_max_;
+  float duty_max_nvm_;
   float duty_min_;
-  TaskHandle_t task_handle_alarm_;
+  float duty_min_nvm_;
   AlarmMode_t mode_;
+  AlarmMode_t mode_nvm_;
+
+  TaskHandle_t task_handle_alarm_;
 };

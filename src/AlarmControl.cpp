@@ -19,8 +19,10 @@ AlarmControl::AlarmControl(LEDControl *led_control) :
     this->preferences_->putString("alarmtime", this->alarm_time_);
     log_d("Setting default value for alarmtime: %s", this->alarm_time_);
   }
+  memcpy(&this->alarm_time_nvm_, &this->alarm_time_, sizeof(this->alarm_time_nvm_));
 
   this->alarm_weekend_ = this->preferences_->getBool("alarmwe", false);
+  this->alarm_weekend_nvm_ = this->alarm_weekend_;
 
   this->fade_minutes_ = this->preferences_->getUInt("fade_min", 0);
   if (this->fade_minutes_ == 0 || this->fade_minutes_ >= 150)
@@ -29,6 +31,7 @@ AlarmControl::AlarmControl(LEDControl *led_control) :
     this->preferences_->putUInt("fade_min", this->fade_minutes_);
     log_d("Setting default value for fade_min: %u", this->fade_minutes_);
   }
+  this->fade_minutes_nvm_ = this->fade_minutes_;
 
   this->duty_max_ = this->preferences_->getFloat("duty_max", 0.0f);
   if (this->duty_max_ <= 0.0f || this->duty_max_ > 99.0f)
@@ -37,6 +40,7 @@ AlarmControl::AlarmControl(LEDControl *led_control) :
     this->preferences_->putFloat("duty_max", this->duty_max_);
     log_d("Setting default value for duty_max: %.2f", this->duty_max_);
   }
+  this->duty_max_nvm_ = this->duty_max_;
 
   this->duty_min_ = this->preferences_->getFloat("duty_min", 0.0f);
   if (this->duty_min_ <= 0.0f || this->duty_min_ > 99.0f)
@@ -45,6 +49,7 @@ AlarmControl::AlarmControl(LEDControl *led_control) :
     this->preferences_->putFloat("duty_min", this->duty_min_);
     log_d("Setting default value for duty_min: %.2f", this->duty_min_);
   }
+  this->duty_min_nvm_ = this->duty_min_;
 
   this->mode_ = (AlarmMode_t)(this->preferences_->getUChar("mode", ALARMMODE_ALARM_ON));
   if ((uint8_t)(this->mode_) >= ALARMMODE_LIMIT)
@@ -53,6 +58,7 @@ AlarmControl::AlarmControl(LEDControl *led_control) :
     this->preferences_->putUChar("mode", (uint8_t)(this->mode_));
     log_d("Setting default value for mode: %u", this->mode_);
   }
+  this->mode_nvm_ = this->mode_;
 
   this->preferences_->end();
   preferences_lock.unlock();
@@ -97,15 +103,6 @@ AlarmControl::AlarmMode_t AlarmControl::getMode(void)
 void AlarmControl::setMode(AlarmControl::AlarmMode_t mode)
 {
   log_d("setMode %u", mode);
-
-  if (this->mode_ != mode)
-  {
-    preferences_lock.lock();
-    this->preferences_->begin("alarmctrl");
-    this->preferences_->putUChar("mode", (uint8_t)(mode));
-    this->preferences_->end();
-    preferences_lock.unlock();
-  }
   this->mode_ = mode;
 }
 
@@ -130,70 +127,30 @@ void AlarmControl::setAlarmON(void)
 void AlarmControl::setAlarmTime(String alarm_time)
 {
   log_d("setAlarmTime %s", alarm_time);
-  if (String(this->alarm_time_) != alarm_time)
-  {
-    preferences_lock.lock();
-    this->preferences_->begin("alarmctrl");
-    this->preferences_->putString("alarmtime", alarm_time.c_str());
-    this->preferences_->end();
-    preferences_lock.unlock();
-  }
   strcpy(this->alarm_time_, alarm_time.c_str());
 }
 
 void AlarmControl::setAlarmWeekend(bool alarm_weekend)
 {
   log_d("setAlarmWeekend %d", alarm_weekend);
-  if (this->alarm_weekend_ != alarm_weekend)
-  {
-    preferences_lock.lock();
-    this->preferences_->begin("alarmctrl");
-    this->preferences_->putBool("alarmwe", alarm_weekend);
-    this->preferences_->end();
-    preferences_lock.unlock();
-  }
   this->alarm_weekend_ = alarm_weekend;
 }
 
 void AlarmControl::setFadeMinutes(uint32_t fade_minutes)
 {
   log_d("setFadeMinutes %u", fade_minutes);
-  if (this->fade_minutes_ != fade_minutes)
-  {
-    preferences_lock.lock();
-    this->preferences_->begin("alarmctrl");
-    this->preferences_->putUInt("fade_min", fade_minutes);
-    this->preferences_->end();
-    preferences_lock.unlock();
-  }
   this->fade_minutes_ = fade_minutes;
 }
 
 void AlarmControl::setDutyMax(float duty_max)
 {
   log_d("setDutyMax %.2f", duty_max);
-  if (this->duty_max_ != duty_max)
-  {
-    preferences_lock.lock();
-    this->preferences_->begin("alarmctrl");
-    this->preferences_->putFloat("duty_max", duty_max);
-    this->preferences_->end();
-    preferences_lock.unlock();
-  }
   this->duty_max_ = duty_max;
 }
 
 void AlarmControl::setDutyMin(float duty_min)
 {
   log_d("setDutyMin %.2f", duty_min);
-  if (this->duty_min_ != duty_min)
-  {
-    preferences_lock.lock();
-    this->preferences_->begin("alarmctrl");
-    this->preferences_->putFloat("duty_min", duty_min);
-    this->preferences_->end();
-    preferences_lock.unlock();
-  }
   this->duty_min_ = duty_min;
 }
 
@@ -211,6 +168,52 @@ void AlarmControl::task_alarm()
   
   while (1)
   {
+    // check and save new values
+    preferences_lock.lock();
+    if (this->alarm_weekend_ != this->alarm_weekend_nvm_)
+    {
+      this->alarm_weekend_nvm_ = this->alarm_weekend_;
+      this->preferences_->begin("alarmctrl");
+      this->preferences_->putBool("alarmwe", this->alarm_weekend_);
+      this->preferences_->end();
+    }
+    if (this->duty_min_ != this->duty_min_nvm_)
+    {
+      this->duty_min_nvm_ = this->duty_min_;
+      this->preferences_->begin("alarmctrl");
+      this->preferences_->putFloat("duty_min", this->duty_min_nvm_);
+      this->preferences_->end();
+    }
+    if (this->duty_max_ != this->duty_max_nvm_)
+    {
+      this->duty_max_nvm_ = this->duty_max_;
+      this->preferences_->begin("alarmctrl");
+      this->preferences_->putFloat("duty_max", this->duty_max_);
+      this->preferences_->end();
+    }
+    if (this->fade_minutes_ != this->fade_minutes_nvm_)
+    {
+      this->fade_minutes_nvm_ = this->fade_minutes_;
+      this->preferences_->begin("alarmctrl");
+      this->preferences_->putUInt("fade_min", this->fade_minutes_);
+      this->preferences_->end();
+    }
+    if (String(this->alarm_time_) != String(this->alarm_time_nvm_))
+    {
+      memcpy(&this->alarm_time_nvm_, &this->alarm_time_, sizeof(this->alarm_time_nvm_));
+      this->preferences_->begin("alarmctrl");
+      this->preferences_->putString("alarmtime", this->alarm_time_);
+      this->preferences_->end();
+    }
+    if (this->mode_ != this->mode_nvm_)
+    {
+      this->mode_nvm_ = this->mode_;
+      this->preferences_->begin("alarmctrl");
+      this->preferences_->putUChar("mode", (uint8_t)(this->mode_));
+      this->preferences_->end();
+    }
+    preferences_lock.unlock();
+
     switch (this->mode_)
     {
     case ALARMMODE_FORCE_ON:
