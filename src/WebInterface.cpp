@@ -48,7 +48,7 @@ WebInterface::WebInterface(AlarmControl *alarm_control) :
   btStop();
 
   if (xTaskCreate(&WebInterface::task_http_wrapper, "task_http", TaskConfig::WiFi_http_stacksize, this, TaskConfig::WiFi_http_priority, &task_handle_http_) != pdPASS)
-    log_e("WebInterface ERROR init failed");
+    log_e("WebInterface ERROR init failed, task_http");
 
   instance = this;
 }
@@ -92,22 +92,6 @@ void WebInterface::wifiCheckConnectionOrReconnect()
     vTaskDelay(pdMS_TO_TICKS(100));
   }
   log_i("WIFI up again!");
-}
-
-// replaces placeholder with values in static html
-static String processor_static(const String& var)
-{
-  log_d("processor_static var: %s", var);
-  
-  return String();
-}
-
-// replaces placeholder with values in xml file
-static String processor_xml(const String& var)
-{
-  log_d("processor_xml var: %s", var);
-
-  return String();
 }
 
 void WebInterface::task_http_wrapper(void *arg)
@@ -194,11 +178,6 @@ void WebInterface::task_http()
     request->send(SPIFFS, "/style.css", "text/css");
   });
 
-  // route to update values
-  server_.on("/update_readings", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send_P(200, "text/xml", XML_CODE, processor_xml);
-  });
-
   // route to on_mode
   server_.on("/on_mode", HTTP_POST, [this](AsyncWebServerRequest *request) {
     request->send(200);
@@ -223,28 +202,25 @@ void WebInterface::task_http()
   // route to set alarm time
   server_.on("/set_alarm_time", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, 
     [this](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
-
       String alarm_time = String(data, len);
       this->alarm_control_->setAlarmTime(alarm_time);
  
-      request->send_P(200, "text/plain", String(this->alarm_control_->getAlarmTime()).c_str());
+      request->send(200, "text/plain", String(this->alarm_control_->getAlarmTime()).c_str());
   });
 
   // route to set alarm weekend
   server_.on("/set_alarm_weekend", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, 
     [this](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
-      
       bool alarm_weekend = strncmp((const char*)(data), "true", len) == 0;
       this->alarm_control_->setAlarmWeekend(alarm_weekend);
  
       String al_we = (this->alarm_control_->getAlarmWeekend())?String("true"):String("false");
-      request->send_P(200, "text/plain", al_we.c_str());
+      request->send(200, "text/plain", al_we.c_str());
   });
 
   // route to set duty cycle
   server_.on("/set_fade_minutes", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, 
     [this](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
-
       std::stringstream ss;
       ss << (char*)data;
       float fade_minutes;
@@ -252,12 +228,11 @@ void WebInterface::task_http()
 
       this->alarm_control_->setFadeMinutes(fade_minutes);
  
-      request->send_P(200, "text/plain", std::to_string(this->alarm_control_->getFadeMinutes()).c_str());
+      request->send(200, "text/plain", std::to_string(this->alarm_control_->getFadeMinutes()).c_str());
   });
 
   server_.on("/set_duty_max", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, 
     [this](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
-
       std::stringstream ss;
       ss << (char*)data;
       float duty_max;
@@ -265,12 +240,11 @@ void WebInterface::task_http()
 
       this->alarm_control_->setDutyMax(duty_max);
  
-      request->send_P(200, "text/plain", std::to_string(duty_max).c_str());
+      request->send(200, "text/plain", std::to_string(duty_max).c_str());
   });
 
   server_.on("/set_duty_min", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, 
     [this](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
-
       std::stringstream ss;
       ss << (char*)data;
       float duty_min;
@@ -278,14 +252,12 @@ void WebInterface::task_http()
 
       this->alarm_control_->setDutyMin(duty_min);
  
-      request->send_P(200, "text/plain", std::to_string(duty_min).c_str());
+      request->send(200, "text/plain", std::to_string(duty_min).c_str());
   });
 
   // route to load style.css file
   server_.on("/parameters", HTTP_GET, [this](AsyncWebServerRequest *request) {
-
     log_d("Received parameters req");
-
     String al_we = (this->alarm_control_->getAlarmWeekend())?String("true"):String("false");
 
     String params = 
@@ -296,7 +268,7 @@ void WebInterface::task_http()
       String(this->alarm_control_->getDutyMax()) + " " +
       String(this->alarm_control_->getDutyMin());
 
-    request->send_P(200, "text/plain", params.c_str());
+    request->send(200, "text/plain", params.c_str());
     log_d("send parameters: %s", params.c_str());
   });
 
