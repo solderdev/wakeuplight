@@ -27,8 +27,11 @@ class Controller {
         console.log("intervalUpdate")
 
         // TODO: fetch esp-32 time and display!
+        this.fetchParameters()
 
-        setTimeout(() => {this.intervalUpdate();}, 1000);
+        setTimeout(() => {
+            this.intervalUpdate()
+        }, 5000);
     }
 
     fetchParameters()
@@ -147,6 +150,6 @@ class Controller {
 
 var app = new Controller(new Model(), new View());
 
-// document.addEventListener('DOMContentLoaded', function() {
-//         app.intervalUpdate();
-//     }, false);
+document.addEventListener('DOMContentLoaded', function() {
+        app.intervalUpdate();
+    }, false);
