@@ -164,7 +164,7 @@ void AlarmControl::task_alarm()
   struct tm timeinfo;
   struct tm timeinfo_alarm;
   float duty_calc;
-  int minutes_diff;
+  float minutes_diff;
   
   while (1)
   {
@@ -244,31 +244,32 @@ void AlarmControl::task_alarm()
       timeinfo_alarm.tm_sec = 0;
 
       // calculate distance to alarm time
-      minutes_diff = difftime(mktime(&timeinfo), mktime(&timeinfo_alarm)) / 60;
+      minutes_diff = difftime(mktime(&timeinfo), mktime(&timeinfo_alarm)) / 60.0f;
 
       // uint8_t start_h = String(this->alarm_time_).substring(0, 2).toInt();
       // uint8_t start_m = String(this->alarm_time_).substring(3, 5).toInt();
       // uint8_t end_h = (uint8_t)(((uint32_t)(start_h) * 60 + start_m + this->fade_minutes_) / 60) % 24;
       // uint8_t end_m = (start_m + this->fade_minutes_) % 60;
 
-      if (minutes_diff >= 0 && minutes_diff < this->fade_minutes_)
+      if (minutes_diff >= 0.0f && minutes_diff < this->fade_minutes_)
       {
         // if we are inside alarm time: calculate current fade duty cycle
-        duty_calc = minutes_diff * 100 / this->fade_minutes_;
-        if (duty_calc >= 100)
+        duty_calc = minutes_diff * 100.0f / this->fade_minutes_;
+        log_d("inside alarm time. min diff: %f duty calc: %f", minutes_diff, duty_calc);
+        if (duty_calc >= 100.0f)
           this->led_control_->setOnMode();
-        else if (duty_calc > 0.0)
+        else if (duty_calc > 0.0f)
           this->led_control_->setDutyCycle(duty_calc);
         else
           this->led_control_->setOffMode();
-        break;
       }
       else
       {
         // we are outside of fading time (< 0 is too early)
+        log_d("outside of fading time. min diff: %f", minutes_diff);
         this->led_control_->setOffMode();
-        break;
       }
+      break;
     
     case ALARMMODE_ALARM_OFF:
       // alarm is off
@@ -279,6 +280,6 @@ void AlarmControl::task_alarm()
       break;
     }
 
-    vTaskDelay(pdMS_TO_TICKS(100));
+    vTaskDelay(pdMS_TO_TICKS(1000));
   }
 }
