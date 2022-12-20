@@ -58,14 +58,14 @@ void loop()
 {
   vTaskDelay(pdMS_TO_TICKS(5000));
 
-  struct tm timeinfo;
-  if(!getLocalTime(&timeinfo, 0)){
-    log_w("Failed to obtain time");
-  }
-  else
-    log_d("%04u-%02u-%02u %02u:%02u:%02u", 
-          1900 + timeinfo.tm_year, timeinfo.tm_mon, timeinfo.tm_mday, 
-          timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
+  // struct tm timeinfo;
+  // if(!getLocalTime(&timeinfo, 0)){
+  //   log_w("Failed to obtain time");
+  // }
+  // else
+  //   log_d("%04u-%02u-%02u %02u:%02u:%02u", 
+  //         1900 + timeinfo.tm_year, timeinfo.tm_mon, timeinfo.tm_mday, 
+  //         timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
 
   // log_d("systime: %u", systime_ms());
 }
