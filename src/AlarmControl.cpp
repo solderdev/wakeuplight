@@ -34,9 +34,9 @@ AlarmControl::AlarmControl(LEDControl *led_control) :
   this->fade_minutes_nvm_ = this->fade_minutes_;
 
   this->duty_max_ = this->preferences_->getFloat("duty_max", 0.0f);
-  if (this->duty_max_ <= 0.0f || this->duty_max_ > 99.0f)
+  if (this->duty_max_ <= 0.0f || this->duty_max_ > 99.999f)
   {
-    this->duty_max_ = 99.0f;
+    this->duty_max_ = 99.9f;
     this->preferences_->putFloat("duty_max", this->duty_max_);
     log_d("Setting default value for duty_max: %.2f", this->duty_max_);
   }
