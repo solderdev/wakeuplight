@@ -89,7 +89,7 @@ void WebInterface::wifiCheckConnectionOrReconnect()
   while (!WiFi.isConnected())
   {
     trycount++;
-    if (trycount > 150)  // 15s
+    if (trycount > 100)  // 10s
     {
       trycount = 0;
       log_d("WIFI still down .. attempting reconnect!");
