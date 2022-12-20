@@ -74,7 +74,7 @@ module pin_holes()
     xcopies(PIN_spacing, n=PIN_num) //PCB_X/2 + PIN_spacing * (PIN_num/2-1)
       translate([PCB_X/2, 0, PIN_socket_height/2-0.5]) // - PIN_spacing * floor(PIN_num/2)
         ycopies(PIN_dist)
-          cube([PIN_dim[0] + 0.15, PIN_dim[1] + 0.15, PIN_socket_height*2], center=true);
+          cube([PIN_dim[0] + 0.2, PIN_dim[1] + 0.2, PIN_socket_height*2], center=true);
 }
 
 module case_bottom()
@@ -148,6 +148,13 @@ module case_top()
                0, 
                -led_strip_h_oversize/2 + LED_strip_height + BOT_height/2 - WALL - PIN_dim[2] - BOT_height/2 + WALL]) 
       cube([10, LED_strip_width, led_strip_h_oversize], center=true);
+    
+    // top graphic
+    depth = 0.2;
+    translate([BOT_x_outside/2, 0, -depth/2 + WALL + PCB_Z + PCB_z_space]) rotate([0, 0, 270])
+      linear_extrude(height=depth + 0.01, center=true)
+        scale(0.5) offset(0.01)
+          import(file = "alarm_clock.svg", center=true);
   }
   
   // positive snap-on ridges
@@ -155,6 +162,7 @@ module case_top()
   {
     translate([x_off, 0, LID_ridge_z_off])
       ycopies(TOP_y_outside - WALL*2)
+        scale([1, 0.8, 1.2])
         difference()
         {
           cylinder(h=BOT_x_outside * 0.8, d=LID_ridge_d, orient=RIGHT, center=true);
