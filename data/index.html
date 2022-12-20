@@ -20,9 +20,9 @@
 <body>
   <div class="header-div">
 
-    <div class="header-div-left">
+    <div class="header-div-center">
       <a class="header-text-left">
-        Wake-Up Light
+        Katrin's Wake-Up Light
       </a>
     </div>
 
@@ -36,7 +36,7 @@
       <button id="alarm_on_button_id" class="control-buttons" type="button" style="animation-delay: 0.4s;">Alarm ON</button>
 
       <form id="alarm_time_form_id" class="container-input-form" style="animation-delay: 0.5s;">
-        <label for="alarm_time_name" class="label-left">Alarm Time:</label>
+        <label for="alarm_time_name" class="label-left">Alarm Start Time:</label>
         <input type="time" required step="60" id="alarm_time_input_id" name="alarm_time_name" class="input-form" spellcheck="false">
       </form>
 
@@ -52,12 +52,12 @@
 
       <form id="duty_max_form_id" class="container-input-form" style="animation-delay: 0.6s;">
         <label for="duty_max_name" class="label-left">Brightness Max &#37;:</label>
-        <input type="number" id="duty_max_input_id" name="duty_max_name" class="input-form" spellcheck="false" step="0.1" min="0.1" max="99.0">
+        <input type="number" id="duty_max_input_id" name="duty_max_name" class="input-form" spellcheck="false" step="0.1" min="0.1" max="99.9">
       </form>
 
       <form id="duty_min_form_id" class="container-input-form" style="animation-delay: 0.6s;">
         <label for="duty_min_name" class="label-left">Brightness Min &#37;:</label>
-        <input type="number" id="duty_min_input_id" name="duty_min_name" class="input-form" spellcheck="false" step="0.1" min="0.1" max="99.0">
+        <input type="number" id="duty_min_input_id" name="duty_min_name" class="input-form" spellcheck="false" step="0.001" min="0.001" max="99.0">
       </form>
 
       <div class="mode-div" style="animation-delay: 0.7s;">
