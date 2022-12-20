@@ -63,8 +63,7 @@ class Controller {
             headers: {'Content-Type': 'text/plain'},
             body: alarm_time.toString() + '\0',
         })
-        .then(response => response.text())
-        .then(data => {
+        .then(response => {
             this.fetchParameters()
         })
     }

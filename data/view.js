@@ -13,7 +13,7 @@ class View
         "click", event => this.onButtonClick(event, "alarm_on"), true);
 
     document.getElementById('alarm_time_form_id').addEventListener(
-        "change", event => this.onSubmitAlarmTime(event), true);
+        "focusout", event => this.onSubmitAlarmTime(event), true);
     document.getElementById('alarm_time_form_id').addEventListener(
         "submit", event => this.onSubmitPreventDefault(event), true);
  
@@ -123,8 +123,8 @@ class View
     console.log("View:onSubmitDutyMax()")
     event.preventDefault()
 
-    let duty_max = Math.max(0.1, parseFloat(document.getElementById('duty_max_input_id').value))
-    duty_max = Math.min(99.0, duty_max)
+    let duty_max = Math.max(0.001, parseFloat(document.getElementById('duty_max_input_id').value))
+    duty_max = Math.min(99.9, duty_max)
 
     console.log("Max Duty: " + duty_max.toString())
 
@@ -136,8 +136,8 @@ class View
     console.log("View:onSubmitDutyMin()")
     event.preventDefault()
 
-    let duty_min = Math.max(0.1, parseFloat(document.getElementById('duty_min_input_id').value))
-    duty_min = Math.min(99.0, duty_min)
+    let duty_min = Math.max(0.001, parseFloat(document.getElementById('duty_min_input_id').value))
+    duty_min = Math.min(99.9, duty_min)
 
     console.log("Min Duty: " + duty_min.toString())
 
