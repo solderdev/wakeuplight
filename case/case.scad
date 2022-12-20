@@ -150,7 +150,7 @@ module case_top()
       cube([10, LED_strip_width, led_strip_h_oversize], center=true);
     
     // top graphic
-    depth = 0.2;
+    depth = 0.8;
     translate([BOT_x_outside/2, 0, -depth/2 + WALL + PCB_Z + PCB_z_space]) rotate([0, 0, 270])
       linear_extrude(height=depth + 0.01, center=true)
         scale(0.5) offset(0.01)
@@ -162,7 +162,7 @@ module case_top()
   {
     translate([x_off, 0, LID_ridge_z_off])
       ycopies(TOP_y_outside - WALL*2)
-        scale([1, 0.8, 1.2])
+        scale([1, 0.8, 1.3])
         difference()
         {
           cylinder(h=BOT_x_outside * 0.8, d=LID_ridge_d, orient=RIGHT, center=true);
