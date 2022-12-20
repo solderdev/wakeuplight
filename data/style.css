@@ -22,11 +22,6 @@ html, body {
   padding-top: 4px;
   margin-bottom: 5px;
   border-bottom: 2px solid darkgray;
-
-  animation-name: header-fade-in-anim;
-  animation-duration: 0.5s;
-  animation-timing-function: ease-in-out;
-  animation-fill-mode: forwards;
 }
 
 .header-div-left {
@@ -84,10 +79,6 @@ html, body {
   border-radius: 5px;
   background-color: white;
   border: 2px solid darkgray;
-  animation-name: fade-in-anim;
-  animation-duration: 0.5s;
-  animation-timing-function: ease-in-out;
-  animation-fill-mode: forwards;
 }
 
 .container-right {
@@ -115,12 +106,6 @@ html, body {
   font-size: 16px;
   transition-duration: 0.2s;
   outline:none;
-
-  animation-name: fade-in-anim;
-  animation-delay: 0.25s;
-  animation-duration: 0.5s;
-  animation-timing-function: ease-in-out;
-  animation-fill-mode: both;
 }
 
 .control-buttons:hover {
@@ -138,12 +123,6 @@ html, body {
   padding-top: 10px;
   padding-left: 10px;
   padding-right: 10px;
-
-  animation-name: fade-in-anim;
-  animation-delay: 0.5s;
-  animation-duration: 0.5s;
-  animation-timing-function: ease-in-out;
-  animation-fill-mode: both;
 }
 
 .input-form
@@ -166,11 +145,6 @@ html, body {
   justify-content: space-around;
   margin-top: 30px;
   margin-bottom: 30px;
-  animation-name: fade-in-anim;
-  animation-delay: 0.5s;
-  animation-duration: 0.5s;
-  animation-timing-function: ease-in-out;
-  animation-fill-mode: both;
 }
 
 .mode-a
@@ -187,14 +161,4 @@ input::-webkit-inner-spin-button {
 
 input[type=number] {
   -moz-appearance: textfield;
-}
-
-@keyframes header-fade-in-anim {
-  0%   {transform: translate(0px, -100px); opacity: 0.0}
-  100% {transform: translate(0px, 0px); opacity: 1.0}
-}
-
-@keyframes fade-in-anim {
-  0%   {transform: translate(0px, 100px); opacity: 0.0}
-  100% {transform: translate(0px, 0px); opacity: 1.0}
 }
