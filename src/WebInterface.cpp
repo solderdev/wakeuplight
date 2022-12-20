@@ -187,16 +187,18 @@ void WebInterface::task_http()
 
   // route to alarm_off
   server_.on("/alarm_off", HTTP_POST, [this](AsyncWebServerRequest *request) {
-    request->send(200);
     log_d("Received alarm_off");
+    request->send(200);
     this->alarm_control_->setAlarmOFF();
+    log_d("Received alarm_off done");
   });
 
   // route to pwm_mode
   server_.on("/alarm_on", HTTP_POST, [this](AsyncWebServerRequest *request) {
-    request->send(200);
     log_d("Received alarm_on");
+    request->send(200);
     this->alarm_control_->setAlarmON();
+    log_d("Received alarm_on done");
   });
 
   // route to set alarm time
@@ -265,8 +267,8 @@ void WebInterface::task_http()
       al_we + " " +  // TODO check what is actually sent here vs. controller.js:48
       String(this->alarm_control_->getFadeMinutes()) + " " + 
       String(this->alarm_control_->getMode()) + " " + 
-      String(this->alarm_control_->getDutyMax()) + " " +
-      String(this->alarm_control_->getDutyMin());
+      String(this->alarm_control_->getDutyMax(), 3) + " " +
+      String(this->alarm_control_->getDutyMin(), 3);
 
     request->send(200, "text/plain", params.c_str());
     log_d("send parameters: %s", params.c_str());
@@ -342,7 +344,7 @@ void WebInterface::task_ota()
   
   while(1)
   {
-    vTaskDelay(pdMS_TO_TICKS(2));
+    vTaskDelay(pdMS_TO_TICKS(5));
     
     if (WiFi.isConnected())
       ArduinoOTA.handle();
