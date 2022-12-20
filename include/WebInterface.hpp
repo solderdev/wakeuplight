@@ -33,4 +33,6 @@ private:
   TaskHandle_t task_handle_ota_;
 
   AlarmControl *alarm_control_;
+
+  uint8_t wifi_select_idx_;
 };

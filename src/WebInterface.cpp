@@ -29,7 +29,8 @@ WebInterface::WebInterface(AlarmControl *alarm_control) :
   server_(80),
   task_handle_http_(nullptr),
   task_handle_ota_(nullptr),
-  alarm_control_(alarm_control)
+  alarm_control_(alarm_control),
+  wifi_select_idx_(0)
 {
   if (instance)
   {
@@ -65,7 +66,12 @@ void WebInterface::wifiReconnect()
   WiFi.mode(WIFI_STA);
   WiFi.setHostname(HOSTNAME);
   vTaskDelay(pdMS_TO_TICKS(1000));
-  WiFi.begin(WIFISSID, WIFIPW);
+
+  log_d("trying wifi %u with: %s / %s", this->wifi_select_idx_, WIFICREDS[this->wifi_select_idx_].ssid, WIFICREDS[this->wifi_select_idx_].pw);
+  WiFi.begin(WIFICREDS[this->wifi_select_idx_].ssid, WIFICREDS[this->wifi_select_idx_].pw);
+  this->wifi_select_idx_ += 1;
+  this->wifi_select_idx_ %= sizeof(WIFICREDS) / sizeof(WIFICREDS[0]);
+  
   WiFi.setSleep(true);
   WiFi.setTxPower(WIFI_POWER_MINUS_1dBm);  // WIFI_POWER_19_5dBm
 }
@@ -101,8 +107,6 @@ void WebInterface::task_http_wrapper(void *arg)
 }
 void WebInterface::task_http()
 {
-  log_d("Attempting to connect to SSID: %s", WIFISSID);
-
   wifiCheckConnectionOrReconnect();
 
   IPAddress ip = WiFi.localIP();
