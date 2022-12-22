@@ -56,7 +56,12 @@ void setup()
 
 void loop()
 {
-  vTaskDelay(pdMS_TO_TICKS(5000));
+  vTaskDelay(pdMS_TO_TICKS(3000));
+  // log_d("ON");
+  // led_control->setOnMode();
+  // vTaskDelay(pdMS_TO_TICKS(3000));
+  // log_d("Off");
+  // led_control->setOffMode();
 
   // struct tm timeinfo;
   // if(!getLocalTime(&timeinfo, 0)){

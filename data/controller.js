@@ -150,6 +150,6 @@ class Controller {
 
 var app = new Controller(new Model(), new View());
 
-document.addEventListener('DOMContentLoaded', function() {
-        app.intervalUpdate();
-    }, false);
+// document.addEventListener('DOMContentLoaded', function() {
+//         app.intervalUpdate();
+//     }, false);
