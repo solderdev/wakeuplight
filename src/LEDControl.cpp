@@ -15,7 +15,7 @@ LEDControl::LEDControl(uint8_t ctrl_pin_1, mcpwm_unit_t mcpwm_unit_id) :
   this->duty_percent_ = 50.0f;
   
   log_d("init mcpwm driver");
-  // this->updateTiming(this->frequency_hz_, this->duty_percent_);
+  this->updateTiming(this->frequency_hz_, this->duty_percent_);
   this->setOffMode();
 }
 
