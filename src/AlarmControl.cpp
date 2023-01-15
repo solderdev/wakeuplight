@@ -168,6 +168,8 @@ void AlarmControl::task_alarm()
   
   while (1)
   {
+    vTaskDelay(pdMS_TO_TICKS(1000));
+
     // check and save new values
     preferences_lock.lock();
     if (this->alarm_weekend_ != this->alarm_weekend_nvm_)
@@ -218,7 +220,7 @@ void AlarmControl::task_alarm()
     {
     case ALARMMODE_FORCE_ON:
       // we are instructed to stay 100% on
-      this->led_control_->setOnMode();
+      this->led_control_->setDutyCycle(90.0f);
       break;
 
     case ALARMMODE_ALARM_ON:
@@ -279,7 +281,5 @@ void AlarmControl::task_alarm()
     default:
       break;
     }
-
-    vTaskDelay(pdMS_TO_TICKS(1000));
   }
 }
