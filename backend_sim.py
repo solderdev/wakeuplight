@@ -23,8 +23,8 @@ def parameters():
     return p_str
 
 
-@app.post('/on_mode')
-def on_mode():
+@app.post('/lights_on')
+def lights_on():
     global _alarm_mode
     _alarm_mode = 0
     return ''
@@ -84,4 +84,4 @@ def set_duty_min():
     return ''
 
 
-app.run(debug=True, port=80, host='localhost')
+app.run(debug=True, port=8080, host='localhost')

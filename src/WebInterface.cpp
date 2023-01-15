@@ -182,10 +182,10 @@ void WebInterface::task_http()
     request->send(SPIFFS, "/style.css", "text/css");
   });
 
-  // route to on_mode
-  server_.on("/on_mode", HTTP_POST, [this](AsyncWebServerRequest *request) {
+  // route to lights_on
+  server_.on("/lights_on", HTTP_POST, [this](AsyncWebServerRequest *request) {
     request->send(200);
-    log_d("Received on_mode");
+    log_d("Received lights_on");
     this->alarm_control_->setOnMode();
   });
 

@@ -3,8 +3,8 @@ class View
 {
   constructor() 
   {
-    document.getElementById('on_mode_button_id').addEventListener(
-        "click", event => this.onButtonClick(event, "on_mode"), true);
+    document.getElementById('lights_on_button_id').addEventListener(
+        "click", event => this.onButtonClick(event, "lights_on"), true);
     
     document.getElementById('alarm_off_button_id').addEventListener(
         "click", event => this.onButtonClick(event, "alarm_off"), true);

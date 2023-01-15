@@ -130,7 +130,7 @@ class Controller {
     {
         console.log("Controller:onOnMode(" + name + ")")
 
-        let endpoint = "on_mode"
+        let endpoint = "lights_on"
 
         if(name == "alarm_off") endpoint = "alarm_off"
         if(name == "alarm_on") endpoint = "alarm_on"
