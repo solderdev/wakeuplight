@@ -212,8 +212,8 @@ void WebInterface::task_http()
       String(this->alarm_control_->getDutyMax(), 3) + " " +
       String(this->alarm_control_->getDutyMin(), 3);
 
-    request->send(200, "text/plain", params.c_str());
-    log_d("send parameters: %s", params.c_str());
+    request->send(200, "text/plain", params);
+    log_d("send parameters: %s", params);
   });
 
   // route to reset
