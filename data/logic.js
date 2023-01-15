@@ -1,5 +1,3 @@
-// noinspection DuplicatedCode
-
 class Logic {
     constructor() {
         console.log('Creating Logic')

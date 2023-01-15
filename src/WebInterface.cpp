@@ -14,12 +14,11 @@
 
 // Docu:
 // https://registry.platformio.org/libraries/me-no-dev/ESP%20Async%20WebServer
+// https://realfavicongenerator.net
+
+// picture send as data-URI: https://www.thetawelle.de/?p=6362&cpage=1
 
 // from https://techtutorialsx.com/2017/12/16/esp32-arduino-async-http-server-serving-a-html-page-from-flash-memory/
-// HTML compressor: https://htmlcompressor.com/compressor/ or https://www.willpeavy.com/minifier/
-// text to C converter: http://tomeko.net/online_tools/cpp_text_escape.php?lang=en
-
-static const char XML_CODE[] = "<?xml version = \"1.0\"?>\n<inputs>\n<rd>\n%L1%\n</rd>\n<rd>\n%L2%\n</rd>\n<pwr>\n%POWERSTATE%\n</pwr>\n</inputs>";
 
 static const char HOSTNAME[] = "wakeuplight";
 
@@ -117,70 +116,9 @@ void WebInterface::task_http()
     log_e("Error setting up MDNS responder!");
   else
     log_i("mDNS responder started");
-  
-  // https://realfavicongenerator.net
-  server_.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request){
-    log_d("Received favicon get");
-    request->send(SPIFFS, "/favicon.ico", "image/svg+xml");
-  });
-  server_.on("/apple-touch-icon.png", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/apple-touch-icon.png", "image/png");
-  });
-  server_.on("/apple-touch-icon-60x60.png", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/apple-touch-icon-60x60.png", "image/png");
-  });
-  server_.on("/apple-touch-icon-76x76.png", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/apple-touch-icon-76x76.png", "image/png");
-  });
-  server_.on("/apple-touch-icon-120x120.png", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/apple-touch-icon-120x120.png", "image/png");
-  });
-  server_.on("/apple-touch-icon-152x152.png", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/apple-touch-icon-152x152.png", "image/png");
-  });
-  server_.on("/apple-touch-icon-180x180.png", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/apple-touch-icon-180x180.png", "image/png");
-  });
-  server_.on("/favicon-32x32.png", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/favicon-32x32.png", "image/png");
-  });
-  server_.on("/favicon-16x16.png", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/favicon-16x16.png", "image/png");
-  });
-  server_.on("/site.webmanifest", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/site.webmanifest", "text/plain");
-  });
-  server_.on("/safari-pinned-tab.svg", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/safari-pinned-tab.svg", "image/svg+xml");
-  });
-  server_.on("/android-chrome-192x192.png", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/android-chrome-192x192.png", "image/png");
-  });
-  server_.on("/android-chrome-512x512.png", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/android-chrome-512x512.png", "image/png");
-  });
-  server_.on("/mstile-150x150.png", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/mstile-150x150.png", "image/png");
-  });
-  server_.on("/browserconfig.xml", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/browserconfig.xml", "text/xml");
-  });
 
-  // FIXME: this crashes?? SPIFFS seems to conflict with hardware timers!
+  // serve static files: images, html, js, css
   server_.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
-
-  server_.on("/view.js", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(SPIFFS, "/view.js", "text/javascript");
-  });
-  server_.on("/model.js", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(SPIFFS, "/model.js", "text/javascript");
-  });
-  server_.on("/controller.js", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(SPIFFS, "/controller.js", "text/javascript");
-  });
-  server_.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(SPIFFS, "/style.css", "text/css");
-  });
 
   // route to lights_on
   server_.on("/lights_on", HTTP_POST, [this](AsyncWebServerRequest *request) {
@@ -264,11 +202,11 @@ void WebInterface::task_http()
   // route to load style.css file
   server_.on("/parameters", HTTP_GET, [this](AsyncWebServerRequest *request) {
     log_d("Received parameters req");
-    String al_we = (this->alarm_control_->getAlarmWeekend())?String("true"):String("false");
+    String al_we = (this->alarm_control_->getAlarmWeekend()) ? String("true") : String("false");
 
     String params = 
       this->alarm_control_->getAlarmTime() + " " +
-      al_we + " " +  // TODO check what is actually sent here vs. controller.js:48
+      al_we + " " +
       String(this->alarm_control_->getFadeMinutes()) + " " + 
       String(this->alarm_control_->getMode()) + " " + 
       String(this->alarm_control_->getDutyMax(), 3) + " " +
@@ -285,7 +223,7 @@ void WebInterface::task_http()
   });
 
   // respond to GET requests on URL /heap
-  server_.on("/heap", HTTP_GET, [](AsyncWebServerRequest *request){
+  server_.on("/heap", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send(200, "text/plain", "Free heap: " + String(ESP.getFreeHeap()));
   });
 
@@ -301,7 +239,7 @@ void WebInterface::task_http()
   {
     wifiCheckConnectionOrReconnect();
 
-    vTaskDelay(pdMS_TO_TICKS(100));
+    vTaskDelay(pdMS_TO_TICKS(1000));
   }
 }
 
@@ -348,7 +286,7 @@ void WebInterface::task_ota()
   
   while(1)
   {
-    vTaskDelay(pdMS_TO_TICKS(5));
+    vTaskDelay(pdMS_TO_TICKS(100));
     
     if (WiFi.isConnected())
       ArduinoOTA.handle();
