@@ -286,7 +286,7 @@ void WebInterface::task_ota()
   
   while(1)
   {
-    vTaskDelay(pdMS_TO_TICKS(100));
+    vTaskDelay(pdMS_TO_TICKS(5));
     
     if (WiFi.isConnected())
       ArduinoOTA.handle();
