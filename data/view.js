@@ -48,7 +48,7 @@ class View
     console.log("HOST: " + window.location.hostname)
     console.log("PORT: " + window.location.port)
 
-    this.model.setHostIP(window.location.hostname)
+    this.model.setHostIP(window.location.hostname + ":" + window.location.port)
   }
 
   bindOnButtonClickCB(callback) { this.onButtonClickCB = callback }
