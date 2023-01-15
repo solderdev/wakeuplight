@@ -100,6 +100,8 @@ class Logic {
     }
 
     post_and_fetch(endpoint, body_data) {
+        document.getElementById('mode_id').innerHTML = "updating ..."
+        
         fetch(this.host_uri + endpoint, {
             method: 'POST',
             headers: {'Content-Type': 'text/plain'},
@@ -118,7 +120,7 @@ class Logic {
         else if (name === "alarm_on") endpoint = "alarm_on"
         else if (name === "lights_on") endpoint = "lights_on"
         else {
-            console.log("ERROR: undefined button callback name: " + name)
+            console.error("ERROR: undefined button callback name: " + name)
             return
         }
         this.post_and_fetch(endpoint, null)

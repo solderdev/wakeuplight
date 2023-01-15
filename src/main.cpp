@@ -29,7 +29,7 @@ unsigned long IRAM_ATTR systime_ms()
 
 void setup()
 {
-  // setCpuFrequencyMhz(80);
+  setCpuFrequencyMhz(80);
   systime_init();
 
   esp_log_level_set("*", ESP_LOG_DEBUG);
@@ -56,7 +56,7 @@ void setup()
 
 void loop()
 {
-  vTaskDelay(pdMS_TO_TICKS(3000));
+  vTaskDelay(pdMS_TO_TICKS(5551));
   // log_d("ON");
   // led_control->setOnMode();
   // vTaskDelay(pdMS_TO_TICKS(3000));
