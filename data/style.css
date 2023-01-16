@@ -6,7 +6,6 @@
 html, body {
   margin: 0px;
   padding: 0px;
-  /*background: url('images/vif-fancy-background-desaturated.jpg');*/
   background-size:auto;
   background-repeat:no-repeat;
   background-color: lightgray;
@@ -24,15 +23,6 @@ html, body {
   border-bottom: 2px solid darkgray;
 }
 
-.header-div-left {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: row;  
-  align-items: center;
-  justify-content: flex-start;
-}
-
 .header-div-center {
   width: 100%;
   height: 100%;
@@ -42,16 +32,7 @@ html, body {
   justify-content: center;
 }
 
-.header-div-right {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: row;  
-  align-items: center;
-  justify-content: right;
-}
-
-.header-text-left {
+.header-text {
   color:white;
   font-size: 16px;
   font-family: monospace;
@@ -75,16 +56,6 @@ html, body {
   flex: 1 150px;
   /*height: 400px;*/
   max-width: 300px;
-  padding: 5px;
-  border-radius: 5px;
-  background-color: white;
-  border: 2px solid darkgray;
-}
-
-.container-right {
-  display: block;
-  flex: 4 150px;
-  height: 800px;
   padding: 5px;
   border-radius: 5px;
   background-color: white;
@@ -150,7 +121,6 @@ html, body {
 .mode-a
 {
   font-size: 30px;
-  /*font-family: 'Times New Roman', serif;*/
 }
 
 input::-webkit-outer-spin-button,
