@@ -187,16 +187,16 @@ void WebInterface::task_http()
       request->send(200, "text/plain", std::to_string(duty_max).c_str());
   });
 
-  server_.on("/set_duty_min", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, 
+  server_.on("/set_duty_lights_on", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, 
     [this](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
       std::stringstream ss;
       ss << (char*)data;
-      float duty_min;
-      ss >> duty_min;
+      float duty;
+      ss >> duty;
 
-      this->alarm_control_->setDutyMin(duty_min);
+      this->alarm_control_->setDutyLightsOn(duty);
  
-      request->send(200, "text/plain", std::to_string(duty_min).c_str());
+      request->send(200, "text/plain", std::to_string(duty).c_str());
   });
 
   // route to load style.css file
@@ -210,7 +210,7 @@ void WebInterface::task_http()
       String(this->alarm_control_->getFadeMinutes()) + " " + 
       String(this->alarm_control_->getMode()) + " " + 
       String(this->alarm_control_->getDutyMax(), 3) + " " +
-      String(this->alarm_control_->getDutyMin(), 3);
+      String(this->alarm_control_->getDutyLightsOn(), 3);
 
     request->send(200, "text/plain", params);
     log_d("send parameters: %s", params);

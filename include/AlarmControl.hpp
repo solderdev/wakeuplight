@@ -22,7 +22,7 @@ public:
   bool getAlarmWeekend(void);
   uint32_t getFadeMinutes(void);
   float getDutyMax(void);
-  float getDutyMin(void);
+  float getDutyLightsOn(void);
   AlarmMode_t getMode(void);
   void setOnMode(void);
   void setMode(AlarmControl::AlarmMode_t mode);
@@ -32,7 +32,7 @@ public:
   void setAlarmWeekend(bool alarm_weekend);
   void setFadeMinutes(uint32_t fade_minutes);
   void setDutyMax(float duty_max);
-  void setDutyMin(float duty_min);
+  void setDutyLightsOn(float duty);
 
 private:
   static void task_alarm_wrapper(void *arg);
@@ -47,8 +47,8 @@ private:
   uint32_t fade_minutes_nvm_;
   float duty_max_;
   float duty_max_nvm_;
-  float duty_min_;
-  float duty_min_nvm_;
+  float duty_lights_on_;
+  float duty_lights_on_nvm_;
   AlarmMode_t mode_;
   AlarmMode_t mode_nvm_;
 

@@ -8,7 +8,7 @@ _alarm_weekends = False
 _alarm_mode = 0
 _fade_min = 44
 _duty_max = 99.8
-_duty_min = 0.01
+_duty_lights_on = 50.0
 
 
 @app.route('/')
@@ -18,7 +18,7 @@ def root():
 
 @app.get('/parameters')
 def parameters():
-    p_str = f'{_alarm_time} {"true" if _alarm_weekends else "false"} {_fade_min} {_alarm_mode} {_duty_max} {_duty_min}'
+    p_str = f'{_alarm_time} {"true" if _alarm_weekends else "false"} {_fade_min} {_alarm_mode} {_duty_max} {_duty_lights_on}'
     print(f'params: {p_str.encode()}')
     return p_str
 
@@ -76,12 +76,12 @@ def set_duty_max():
     return ''
 
 
-@app.post('/set_duty_min')
+@app.post('/set_duty_lights_on')
 def set_duty_min():
-    global _duty_min
-    _duty_min = float(request.get_data().decode().strip().rstrip('\x00'))
-    print(_duty_min)
+    global _duty_lights_on
+    _duty_lights_on = float(request.get_data().decode().strip().rstrip('\x00'))
+    print(_duty_lights_on)
     return ''
 
 
-app.run(debug=True, port=8080, host='localhost')
+app.run(debug=True, port=8080, host='0.0.0.0')

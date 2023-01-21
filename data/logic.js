@@ -7,7 +7,7 @@ class Logic {
         this.fade_minutes = 20
         this.mode = 2
         this.duty_max = 99.0
-        this.duty_min = 1.0
+        this.duty_lights_on = 60.0
         // noinspection HttpUrlsUsage
         this.host_uri = "http://" + window.location.hostname + ":" + window.location.port + "/"
 
@@ -42,9 +42,9 @@ class Logic {
         document.getElementById('duty_max_form_id').addEventListener(
             "submit", event => this.onSubmitPreventDefault(event), true)
 
-        document.getElementById('duty_min_form_id').addEventListener(
-            "change", event => this.onSubmitDutyMin(event), true)
-        document.getElementById('duty_min_form_id').addEventListener(
+        document.getElementById('duty_lights_on_form_id').addEventListener(
+            "change", event => this.onSubmitDutyLightsOn(event), true)
+        document.getElementById('duty_lights_on_form_id').addEventListener(
             "submit", event => this.onSubmitPreventDefault(event), true)
 
         this.fetchParameters()
@@ -76,21 +76,23 @@ class Logic {
                 this.fade_minutes = parseInt(params[2])
                 this.mode = parseInt(params[3])
                 this.duty_max = parseFloat(params[4])
-                this.duty_min = parseFloat(params[5])
+                this.duty_lights_on = parseFloat(params[5])
 
                 console.log('update: alarm_time=' + this.alarm_time +
                     ' alarm_weekend=' + this.alarm_weekend +
                     ' fade_minutes=' + this.fade_minutes +
                     ' mode=' + this.mode +
                     ' duty_max=' + this.duty_max +
-                    ' duty_min=' + this.duty_min)
+                    ' duty_lights_on=' + this.duty_lights_on)
 
                 document.getElementById('alarm_time_input_id').value = this.alarm_time
                 document.getElementById('alarm_weekend_input_id').checked = this.alarm_weekend
                 document.getElementById('fade_minutes_input_id').value = this.fade_minutes
                 document.getElementById('mode_id').innerHTML = this.modeToString(this.mode)
                 document.getElementById('duty_max_input_id').value = this.duty_max
-                document.getElementById('duty_min_input_id').value = this.duty_min
+                document.getElementById('duty_lights_on_input_id').value = this.duty_lights_on
+    	        document.getElementById('duty_lights_on_input_id').style.background =
+                    `linear-gradient(to right,#4BD663,#4BD663 ${this.duty_lights_on}%,#eee ${this.duty_lights_on}%)`;
             })
     }
 
@@ -154,19 +156,21 @@ class Logic {
     onSubmitDutyMax(event) {
         console.log("onSubmitDutyMax()")
         event.preventDefault()
-        let duty_max = Math.max(0.001, parseFloat(document.getElementById('duty_max_input_id').value))
-        duty_max = Math.min(99.999, duty_max)
-        console.log("Max Duty: " + duty_max.toString())
-        this.post_and_fetch("set_duty_max", duty_max.toString() + '\0')
+        let duty = Math.max(0.001, parseFloat(document.getElementById('duty_max_input_id').value))
+        duty = Math.min(99.999, duty)
+        console.log("Max Duty: " + duty.toString())
+        this.post_and_fetch("set_duty_max", duty.toString() + '\0')
     }
 
-    onSubmitDutyMin(event) {
-        console.log("onSubmitDutyMin()")
+    onSubmitDutyLightsOn(event) {
+        console.log("onSubmitDutyLightsOn()")
         event.preventDefault()
-        let duty_min = Math.max(0.001, parseFloat(document.getElementById('duty_min_input_id').value))
-        duty_min = Math.min(99.999, duty_min)
-        console.log("Min Duty: " + duty_min.toString())
-        this.post_and_fetch("set_duty_min", duty_min.toString() + '\0')
+        let duty = Math.max(0.001, parseFloat(document.getElementById('duty_lights_on_input_id').value))
+        duty = Math.min(100.0, duty)
+    	document.getElementById('duty_lights_on_input_id').style.background =
+            `linear-gradient(to right,#4BD663,#4BD663 ${duty}%,#eee ${duty}%)`;
+        console.log("Lights-on Duty: " + duty.toString())
+        this.post_and_fetch("set_duty_lights_on", duty.toString() + '\0')
     }
 }
 

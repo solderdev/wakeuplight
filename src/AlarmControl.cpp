@@ -42,14 +42,14 @@ AlarmControl::AlarmControl(LEDControl *led_control) :
   }
   this->duty_max_nvm_ = this->duty_max_;
 
-  this->duty_min_ = this->preferences_->getFloat("duty_min", 0.0f);
-  if (this->duty_min_ <= 0.0f || this->duty_min_ > 99.0f)
+  this->duty_lights_on_ = this->preferences_->getFloat("duty_lights_on", 0.0f);
+  if (this->duty_lights_on_<= 0.0f || this->duty_lights_on_ > 100.0f)
   {
-    this->duty_min_ = 1.0f;
-    this->preferences_->putFloat("duty_min", this->duty_min_);
-    log_d("Setting default value for duty_min: %.2f", this->duty_min_);
+    this->duty_lights_on_ = 60.0f;
+    this->preferences_->putFloat("duty_lights_on", this->duty_lights_on_);
+    log_d("Setting default value for duty_lights_on: %.2f", this->duty_lights_on_);
   }
-  this->duty_min_nvm_ = this->duty_min_;
+  this->duty_lights_on_nvm_ = this->duty_lights_on_;
 
   this->mode_ = (AlarmMode_t)(this->preferences_->getUChar("mode", ALARMMODE_ALARM_ON));
   if ((uint8_t)(this->mode_) >= ALARMMODE_LIMIT)
@@ -63,8 +63,8 @@ AlarmControl::AlarmControl(LEDControl *led_control) :
   this->preferences_->end();
   preferences_lock.unlock();
 
-  log_i("Initialized Alarm with: alarm_time_=%s alarm_weekend_=%s fade_minutes_=%u duty_max_=%.2f duty_min_=%.2f", 
-        this->alarm_time_, (this->alarm_weekend_)?"true":"false", this->fade_minutes_, this->duty_max_, this->duty_min_);
+  log_i("Initialized Alarm with: alarm_time_=%s alarm_weekend_=%s fade_minutes_=%u duty_max_=%.2f duty_lights_on=%.2f", 
+        this->alarm_time_, (this->alarm_weekend_)?"true":"false", this->fade_minutes_, this->duty_max_, this->duty_lights_on_);
 
   if (xTaskCreate(&AlarmControl::task_alarm_wrapper, "task_alarm", TaskConfig::Alarm_stacksize, this, TaskConfig::Alarm_priority, &task_handle_alarm_) != pdPASS)
     log_e("Alarm ERROR task init failed");
@@ -90,9 +90,9 @@ float AlarmControl::getDutyMax(void)
   return this->duty_max_;
 }
 
-float AlarmControl::getDutyMin(void)
+float AlarmControl::getDutyLightsOn(void)
 {
-  return this->duty_min_;
+  return this->duty_lights_on_;
 }
 
 AlarmControl::AlarmMode_t AlarmControl::getMode(void)
@@ -148,10 +148,10 @@ void AlarmControl::setDutyMax(float duty_max)
   this->duty_max_ = duty_max;
 }
 
-void AlarmControl::setDutyMin(float duty_min)
+void AlarmControl::setDutyLightsOn(float duty)
 {
-  log_d("setDutyMin %.2f", duty_min);
-  this->duty_min_ = duty_min;
+  log_d("setDutyLightsOn %.2f", duty);
+  this->duty_lights_on_ = duty;
 }
 
 void AlarmControl::task_alarm_wrapper(void *arg)
@@ -168,7 +168,7 @@ void AlarmControl::task_alarm()
   
   while (1)
   {
-    vTaskDelay(pdMS_TO_TICKS(1000));
+    vTaskDelay(pdMS_TO_TICKS(100));
 
     // check and save new values
     preferences_lock.lock();
@@ -179,18 +179,18 @@ void AlarmControl::task_alarm()
       this->preferences_->putBool("alarmwe", this->alarm_weekend_);
       this->preferences_->end();
     }
-    if (this->duty_min_ != this->duty_min_nvm_)
-    {
-      this->duty_min_nvm_ = this->duty_min_;
-      this->preferences_->begin("alarmctrl");
-      this->preferences_->putFloat("duty_min", this->duty_min_nvm_);
-      this->preferences_->end();
-    }
     if (this->duty_max_ != this->duty_max_nvm_)
     {
       this->duty_max_nvm_ = this->duty_max_;
       this->preferences_->begin("alarmctrl");
       this->preferences_->putFloat("duty_max", this->duty_max_);
+      this->preferences_->end();
+    }
+    if (this->duty_lights_on_ != this->duty_lights_on_nvm_)
+    {
+      this->duty_lights_on_nvm_ = this->duty_lights_on_;
+      this->preferences_->begin("alarmctrl");
+      this->preferences_->putFloat("duty_lights_on", this->duty_lights_on_nvm_);
       this->preferences_->end();
     }
     if (this->fade_minutes_ != this->fade_minutes_nvm_)
@@ -220,7 +220,7 @@ void AlarmControl::task_alarm()
     {
     case ALARMMODE_FORCE_ON:
       // we are instructed to stay 100% on
-      this->led_control_->setDutyCycle(90.0f);
+      this->led_control_->setDutyCycle(this->duty_lights_on_);
       break;
 
     case ALARMMODE_ALARM_ON:
@@ -253,10 +253,17 @@ void AlarmControl::task_alarm()
       // uint8_t end_h = (uint8_t)(((uint32_t)(start_h) * 60 + start_m + this->fade_minutes_) / 60) % 24;
       // uint8_t end_m = (start_m + this->fade_minutes_) % 60;
 
-      if (minutes_diff >= 0.0f && minutes_diff < this->fade_minutes_)
+      if (minutes_diff < 0.0f)
+      {
+        // too early
+        log_d("outside of fading time. min diff: %f", minutes_diff);
+        this->led_control_->setOffMode();
+      }
+      else if (minutes_diff < this->fade_minutes_)
       {
         // if we are inside alarm time: calculate current fade duty cycle
-        duty_calc = minutes_diff * 100.0f / this->fade_minutes_;
+        duty_calc = minutes_diff * this->duty_max_ / this->fade_minutes_;
+        // TODO - calculate x^3 ramp with top at duty_max
         log_d("inside alarm time. min diff: %f duty calc: %f", minutes_diff, duty_calc);
         if (duty_calc >= 100.0f)
           this->led_control_->setOnMode();
@@ -267,9 +274,9 @@ void AlarmControl::task_alarm()
       }
       else
       {
-        // we are outside of fading time (< 0 is too early)
+        // we are after fading time
         log_d("outside of fading time. min diff: %f", minutes_diff);
-        this->led_control_->setOffMode();
+        this->led_control_->setOffMode(); // TODO
       }
       break;
     
