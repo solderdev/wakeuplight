@@ -142,16 +142,26 @@ void AlarmControl::setFadeMinutes(uint32_t fade_minutes)
   this->fade_minutes_ = fade_minutes;
 }
 
-void AlarmControl::setDutyMax(float duty_max)
+void AlarmControl::setDutyMax(float duty)
 {
-  log_d("setDutyMax %.2f", duty_max);
-  this->duty_max_ = duty_max;
+  if (duty >= 0.0 && duty <= 100.0)
+  {
+    log_d("setDutyMax %.2f", duty);
+    this->duty_max_ = duty;
+  }
+  else
+    log_w("setDutyMax failed: %.2f", duty);
 }
 
 void AlarmControl::setDutyLightsOn(float duty)
 {
-  log_d("setDutyLightsOn %.2f", duty);
-  this->duty_lights_on_ = duty;
+  if (duty >= 0.0 && duty <= 100.0)
+  {
+    log_d("setDutyLightsOn %.2f", duty);
+    this->duty_lights_on_ = duty;
+  }
+  else
+    log_w("setDutyLightsOn failed: %.2f", duty);
 }
 
 void AlarmControl::task_alarm_wrapper(void *arg)
@@ -267,12 +277,7 @@ void AlarmControl::task_alarm()
         duty_calc = minutes_diff * this->duty_max_ / this->fade_minutes_;
         // TODO - calculate x^3 ramp with top at duty_max
         log_d("inside alarm time. min diff: %f duty calc: %f", minutes_diff, duty_calc);
-        if (duty_calc >= 100.0f)
-          this->led_control_->setOnMode();
-        else if (duty_calc > 0.0f)
-          this->led_control_->setDutyCycle(duty_calc);
-        else
-          this->led_control_->setOffMode();
+        this->led_control_->setDutyCycle(duty_calc);
       }
       else
       {

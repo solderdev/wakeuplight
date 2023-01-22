@@ -97,5 +97,10 @@ void LEDControl::setFrequency(uint32_t frequency)
 
 void LEDControl::setDutyCycle(float duty_cycle)
 {
-  this->updateTiming(this->frequency_hz_, duty_cycle);
+  if (duty_cycle >= 100.0f)
+    this->setOnMode();
+  else if (duty_cycle > 0.0f)
+    this->updateTiming(this->frequency_hz_, duty_cycle);
+  else
+    this->setOffMode();
 }

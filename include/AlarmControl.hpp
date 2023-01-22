@@ -31,7 +31,7 @@ public:
   void setAlarmTime(String alarm_time);
   void setAlarmWeekend(bool alarm_weekend);
   void setFadeMinutes(uint32_t fade_minutes);
-  void setDutyMax(float duty_max);
+  void setDutyMax(float duty);
   void setDutyLightsOn(float duty);
 
 private:
