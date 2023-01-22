@@ -165,6 +165,8 @@ void AlarmControl::task_alarm()
   struct tm timeinfo_alarm;
   float duty_calc;
   float minutes_diff;
+
+  this->led_control_->setOffMode();
   
   while (1)
   {
@@ -219,7 +221,7 @@ void AlarmControl::task_alarm()
     switch (this->mode_)
     {
     case ALARMMODE_FORCE_ON:
-      // we are instructed to stay 100% on
+      // we are instructed to stay on
       this->led_control_->setDutyCycle(this->duty_lights_on_);
       break;
 
@@ -227,7 +229,7 @@ void AlarmControl::task_alarm()
       if (!getLocalTime(&timeinfo, 0))
       {
         log_w("Failed to obtain time");
-        this->led_control_->setOffMode();
+        // do not change anything
         vTaskDelay(pdMS_TO_TICKS(1000));
         break;
       }
