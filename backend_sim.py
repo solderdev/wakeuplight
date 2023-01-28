@@ -27,21 +27,21 @@ def parameters():
 def lights_on():
     global _alarm_mode
     _alarm_mode = 0
-    return ''
+    return parameters()
 
 
 @app.post('/alarm_on')
 def alarm_on():
     global _alarm_mode
     _alarm_mode = 1
-    return ''
+    return parameters()
 
 
 @app.post('/alarm_off')
 def alarm_off():
     global _alarm_mode
     _alarm_mode = 2
-    return ''
+    return parameters()
 
 
 @app.post('/set_alarm_time')
@@ -49,7 +49,7 @@ def set_alarm_time():
     global _alarm_time
     _alarm_time = request.get_data().decode().strip().rstrip('\x00')
     print(_alarm_time.encode())
-    return ''
+    return parameters()
 
 
 @app.post('/set_alarm_weekend')
@@ -57,7 +57,7 @@ def set_alarm_weekend():
     global _alarm_weekends
     _alarm_weekends = request.get_data().decode().strip().rstrip('\x00') == 'true'
     print(f'a WE: {_alarm_weekends}')
-    return ''
+    return parameters()
 
 
 @app.post('/set_fade_minutes')
@@ -65,7 +65,7 @@ def set_fade_minutes():
     global _fade_min
     _fade_min = int(request.get_data().decode().strip().rstrip('\x00'))
     print(_fade_min)
-    return ''
+    return parameters()
 
 
 @app.post('/set_duty_max')
@@ -73,7 +73,7 @@ def set_duty_max():
     global _duty_max
     _duty_max = float(request.get_data().decode().strip().rstrip('\x00'))
     print(_duty_max)
-    return ''
+    return parameters()
 
 
 @app.post('/set_duty_lights_on')
@@ -81,7 +81,7 @@ def set_duty_min():
     global _duty_lights_on
     _duty_lights_on = float(request.get_data().decode().strip().rstrip('\x00'))
     print(_duty_lights_on)
-    return ''
+    return parameters()
 
 
 app.run(debug=True, port=8080, host='0.0.0.0')

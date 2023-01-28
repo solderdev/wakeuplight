@@ -39,8 +39,8 @@ private:
   void task_alarm();
   LEDControl *led_control_;
   Preferences *preferences_;
-  char alarm_time_[10]; // TODO check max size
-  char alarm_time_nvm_[10]; // TODO check max size
+  char alarm_time_[10];
+  char alarm_time_nvm_[10];
   bool alarm_weekend_;
   bool alarm_weekend_nvm_;
   uint32_t fade_minutes_;

@@ -99,6 +99,21 @@ void WebInterface::wifiCheckConnectionOrReconnect()
   log_i("WIFI up again!");
 }
 
+String WebInterface::build_parameter_string(void)
+{
+  String al_we = (this->alarm_control_->getAlarmWeekend()) ? String("true") : String("false");
+
+  String params = 
+    this->alarm_control_->getAlarmTime() + " " +
+    al_we + " " +
+    String(this->alarm_control_->getFadeMinutes()) + " " + 
+    String(this->alarm_control_->getMode()) + " " + 
+    String(this->alarm_control_->getDutyMax(), 3) + " " +
+    String(this->alarm_control_->getDutyLightsOn(), 3);
+
+  return params;
+}
+
 void WebInterface::task_http_wrapper(void *arg)
 {
   WebInterface* web_interface = static_cast<WebInterface *>(arg);
@@ -122,25 +137,23 @@ void WebInterface::task_http()
 
   // route to lights_on
   server_.on("/lights_on", HTTP_POST, [this](AsyncWebServerRequest *request) {
-    request->send(200);
     log_d("Received lights_on");
     this->alarm_control_->setOnMode();
+    request->send(200, "text/plain", this->build_parameter_string());
   });
 
   // route to alarm_off
   server_.on("/alarm_off", HTTP_POST, [this](AsyncWebServerRequest *request) {
     log_d("Received alarm_off");
-    request->send(200);
     this->alarm_control_->setAlarmOFF();
-    log_d("Received alarm_off done");
+    request->send(200, "text/plain", this->build_parameter_string());
   });
 
   // route to pwm_mode
   server_.on("/alarm_on", HTTP_POST, [this](AsyncWebServerRequest *request) {
     log_d("Received alarm_on");
-    request->send(200);
     this->alarm_control_->setAlarmON();
-    log_d("Received alarm_on done");
+    request->send(200, "text/plain", this->build_parameter_string());
   });
 
   // route to set alarm time
@@ -148,8 +161,7 @@ void WebInterface::task_http()
     [this](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
       String alarm_time = String(data, len);
       this->alarm_control_->setAlarmTime(alarm_time);
- 
-      request->send(200, "text/plain", String(this->alarm_control_->getAlarmTime()).c_str());
+      request->send(200, "text/plain", this->build_parameter_string());
   });
 
   // route to set alarm weekend
@@ -157,9 +169,7 @@ void WebInterface::task_http()
     [this](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
       bool alarm_weekend = strncmp((const char*)(data), "true", len) == 0;
       this->alarm_control_->setAlarmWeekend(alarm_weekend);
- 
-      String al_we = (this->alarm_control_->getAlarmWeekend())?String("true"):String("false");
-      request->send(200, "text/plain", al_we.c_str());
+      request->send(200, "text/plain", this->build_parameter_string());
   });
 
   // route to set duty cycle
@@ -169,10 +179,8 @@ void WebInterface::task_http()
       ss << (char*)data;
       float fade_minutes;
       ss >> fade_minutes;
-
       this->alarm_control_->setFadeMinutes(fade_minutes);
- 
-      request->send(200, "text/plain", std::to_string(this->alarm_control_->getFadeMinutes()).c_str());
+      request->send(200, "text/plain", this->build_parameter_string());
   });
 
   server_.on("/set_duty_max", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, 
@@ -181,10 +189,8 @@ void WebInterface::task_http()
       ss << (char*)data;
       float duty_max;
       ss >> duty_max;
-
       this->alarm_control_->setDutyMax(duty_max);
- 
-      request->send(200, "text/plain", std::to_string(duty_max).c_str());
+      request->send(200, "text/plain", this->build_parameter_string());
   });
 
   server_.on("/set_duty_lights_on", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, 
@@ -193,25 +199,14 @@ void WebInterface::task_http()
       ss << (char*)data;
       float duty;
       ss >> duty;
-
       this->alarm_control_->setDutyLightsOn(duty);
- 
-      request->send(200, "text/plain", std::to_string(duty).c_str());
+      request->send(200, "text/plain", this->build_parameter_string());
   });
 
   // route to load style.css file
   server_.on("/parameters", HTTP_GET, [this](AsyncWebServerRequest *request) {
     log_d("Received parameters req");
-    String al_we = (this->alarm_control_->getAlarmWeekend()) ? String("true") : String("false");
-
-    String params = 
-      this->alarm_control_->getAlarmTime() + " " +
-      al_we + " " +
-      String(this->alarm_control_->getFadeMinutes()) + " " + 
-      String(this->alarm_control_->getMode()) + " " + 
-      String(this->alarm_control_->getDutyMax(), 3) + " " +
-      String(this->alarm_control_->getDutyLightsOn(), 3);
-
+    String params = this->build_parameter_string();
     request->send(200, "text/plain", params);
     log_d("send parameters: %s", params);
   });

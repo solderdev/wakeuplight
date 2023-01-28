@@ -18,6 +18,7 @@ public:
   AlarmControl* getAlarmControl();
 
 private:
+  String build_parameter_string(void);
   static void task_http_wrapper(void *arg);
   void task_http();
   static void task_ota_wrapper(void *arg);

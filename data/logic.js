@@ -9,7 +9,8 @@ class Logic {
         this.duty_max = 99.0
         this.duty_lights_on = 60.0
         // noinspection HttpUrlsUsage
-        this.host_uri = "http://" + window.location.hostname + ":" + window.location.port + "/"
+        // this.host_uri = "http://" + window.location.hostname + ":" + window.location.port + "/"
+        this.host_uri = window.location.origin + "/"
 
         console.log("URI: " + this.host_uri)
 
@@ -58,6 +59,34 @@ class Logic {
         return "undefined"
     }
 
+    parseParameters(data) {
+        console.log('got Parameters: ' + data)
+        let params = data.split(" ")
+
+        this.alarm_time = params[0]
+        this.alarm_weekend = JSON.parse(params[1]) // true / false
+        this.fade_minutes = parseInt(params[2])
+        this.mode = parseInt(params[3])
+        this.duty_max = parseFloat(params[4])
+        this.duty_lights_on = parseFloat(params[5])
+
+        console.log('update: alarm_time=' + this.alarm_time +
+            ' alarm_weekend=' + this.alarm_weekend +
+            ' fade_minutes=' + this.fade_minutes +
+            ' mode=' + this.mode +
+            ' duty_max=' + this.duty_max +
+            ' duty_lights_on=' + this.duty_lights_on)
+
+        document.getElementById('alarm_time_input_id').value = this.alarm_time
+        document.getElementById('alarm_weekend_input_id').checked = this.alarm_weekend
+        document.getElementById('fade_minutes_input_id').value = this.fade_minutes
+        document.getElementById('mode_id').innerHTML = this.modeToString(this.mode)
+        document.getElementById('duty_max_input_id').value = this.duty_max
+        document.getElementById('duty_lights_on_input_id').value = this.duty_lights_on
+        document.getElementById('duty_lights_on_input_id').style.background =
+            `linear-gradient(to right,#4BD663,#4BD663 ${this.duty_lights_on}%,#eee ${this.duty_lights_on}%)`;
+    }
+
     fetchParameters() {
         console.log('fetchParameters()')
 
@@ -67,33 +96,8 @@ class Logic {
             body: null,
         })
             .then(response => response.text())
-            .then(data => {
-                console.log('got Parameters: ' + data)
-                let params = data.split(" ")
-
-                this.alarm_time = params[0]
-                this.alarm_weekend = JSON.parse(params[1]) // true / false
-                this.fade_minutes = parseInt(params[2])
-                this.mode = parseInt(params[3])
-                this.duty_max = parseFloat(params[4])
-                this.duty_lights_on = parseFloat(params[5])
-
-                console.log('update: alarm_time=' + this.alarm_time +
-                    ' alarm_weekend=' + this.alarm_weekend +
-                    ' fade_minutes=' + this.fade_minutes +
-                    ' mode=' + this.mode +
-                    ' duty_max=' + this.duty_max +
-                    ' duty_lights_on=' + this.duty_lights_on)
-
-                document.getElementById('alarm_time_input_id').value = this.alarm_time
-                document.getElementById('alarm_weekend_input_id').checked = this.alarm_weekend
-                document.getElementById('fade_minutes_input_id').value = this.fade_minutes
-                document.getElementById('mode_id').innerHTML = this.modeToString(this.mode)
-                document.getElementById('duty_max_input_id').value = this.duty_max
-                document.getElementById('duty_lights_on_input_id').value = this.duty_lights_on
-    	        document.getElementById('duty_lights_on_input_id').style.background =
-                    `linear-gradient(to right,#4BD663,#4BD663 ${this.duty_lights_on}%,#eee ${this.duty_lights_on}%)`;
-            })
+            .then(data => {this.parseParameters(data)})
+            // TODO lock inputs until update is complete
     }
 
     onSubmitPreventDefault(event) {
@@ -109,9 +113,8 @@ class Logic {
             headers: {'Content-Type': 'text/plain'},
             body: body_data,
         })
-            .then(response => {
-                this.fetchParameters()
-            })
+            .then(response => response.text())
+            .then(data => {this.parseParameters(data)})
     }
 
     onButtonClick(callback, name) {
