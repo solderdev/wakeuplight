@@ -24,6 +24,10 @@ void LEDControl::updateTiming(uint32_t frequency_hz, float duty_percent)
   if (frequency_hz > 100 && frequency_hz < 30000 &&
       duty_percent > 0.0 && duty_percent < 100.0)
   {
+    // do not re-apply same values
+    if (this->mode == LEDMODE_PWM && this->frequency_hz_ == frequency_hz && this->duty_percent_ == duty_percent)
+      return;
+
     this->frequency_hz_ = frequency_hz;
     this->duty_percent_ = duty_percent;
   }
@@ -75,14 +79,18 @@ LEDControl::LEDMode_t LEDControl::getMode(void)
 
 void LEDControl::setOnMode(void)
 {
-  this->mode = LEDMODE_ON;
-  mcpwm_set_signal_high(this->mcpwm_unit_, MCPWM_TIMER_0, MCPWM_GEN_A);
+  if (this->mode != LEDMODE_ON) {
+    this->mode = LEDMODE_ON;
+    mcpwm_set_signal_high(this->mcpwm_unit_, MCPWM_TIMER_0, MCPWM_GEN_A);
+  }
 }
 
 void LEDControl::setOffMode(void)
 {
-  this->mode = LEDMODE_OFF;
-  mcpwm_set_signal_low(this->mcpwm_unit_, MCPWM_TIMER_0, MCPWM_GEN_A);
+  if (this->mode != LEDMODE_OFF) {
+    this->mode = LEDMODE_OFF;
+    mcpwm_set_signal_low(this->mcpwm_unit_, MCPWM_TIMER_0, MCPWM_GEN_A);
+  }
 }
 
 void LEDControl::setPwmMode(void)
