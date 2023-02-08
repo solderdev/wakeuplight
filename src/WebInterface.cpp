@@ -71,7 +71,7 @@ void WebInterface::wifiReconnect()
   this->wifi_select_idx_ += 1;
   this->wifi_select_idx_ %= sizeof(WIFICREDS) / sizeof(WIFICREDS[0]);
   
-  WiFi.setSleep(true);
+  WiFi.setSleep(false);  // "true" makes mDNS and request extremely slow because packets are lost
   WiFi.setTxPower(WIFI_POWER_MINUS_1dBm);  // WIFI_POWER_19_5dBm
 }
 
