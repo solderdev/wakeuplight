@@ -10,6 +10,12 @@ class Logic {
         this.duty_lights_on = 60.0
         this.current_percent = 1.1
         this.host_uri = window.location.origin + "/"
+        var evsource = new EventSource('/events');
+        evsource.addEventListener('currentpercent', function(e) {
+            console.log('SSE currentpercent', e.data)
+            this.current_percent = parseFloat(e.data)
+            document.getElementById('mode_percent').innerHTML = this.current_percent + ' %'
+        })
 
         console.log("URI: " + this.host_uri)
 

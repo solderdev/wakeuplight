@@ -26,6 +26,7 @@ static WebInterface *instance = nullptr;
 
 WebInterface::WebInterface(AlarmControl *alarm_control) :
   server_(80),
+  events_("/events"),
   task_handle_http_(nullptr),
   task_handle_ota_(nullptr),
   alarm_control_(alarm_control),
@@ -222,7 +223,9 @@ void WebInterface::task_http()
   server_.on("/heap", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send(200, "text/plain", "Free heap: " + String(ESP.getFreeHeap()));
   });
-
+  
+  // add handler for Server-Sent Events
+  server_.addHandler(&events_);
   // start webserver
   server_.begin();
   MDNS.addService("http", "tcp", 80);
@@ -234,6 +237,9 @@ void WebInterface::task_http()
   while (1)
   {
     wifiCheckConnectionOrReconnect();
+
+    // live stream current percent every second
+    events_.send(String(this->alarm_control_->getCurrentDuty(), 3).c_str(), "currentpercent", millis());
 
     vTaskDelay(pdMS_TO_TICKS(1000));
   }

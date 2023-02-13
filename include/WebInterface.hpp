@@ -27,6 +27,7 @@ private:
   void wifiCheckConnectionOrReconnect();
 
   AsyncWebServer server_;
+  AsyncEventSource events_;
   esp_http_client_config_t http_client_config_;
   esp_http_client_handle_t http_client_;
   
