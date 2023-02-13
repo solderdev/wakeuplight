@@ -4,14 +4,15 @@
 
 AlarmControl::AlarmControl(LEDControl *led_control) :
   led_control_(led_control),
-  task_handle_alarm_(nullptr)
+  task_handle_alarm_(nullptr),
+  current_duty_(98.765f)
 {
   this->preferences_ = new Preferences();
   // load saved values
   preferences_lock.lock();
   this->preferences_->begin("alarmctrl");
 
-  this->preferences_->getString("alarmtime", this->alarm_time_, sizeof(this->alarm_time_));  // TODO - check format
+  this->preferences_->getString("alarmtime", this->alarm_time_, sizeof(this->alarm_time_));
   this->alarm_time_[5] = '\0';  // safety
   if (strchr(this->alarm_time_, ':') != this->alarm_time_ + 2)
   {
@@ -29,7 +30,7 @@ AlarmControl::AlarmControl(LEDControl *led_control) :
   {
     this->fade_minutes_ = 30;
     this->preferences_->putUInt("fade_min", this->fade_minutes_);
-    log_d("Setting default value for fade_min: %u", this->fade_minutes_);
+    log_d("Setting default value for fade_minutes: %u", this->fade_minutes_);
   }
   this->fade_minutes_nvm_ = this->fade_minutes_;
 
@@ -100,6 +101,11 @@ AlarmControl::AlarmMode_t AlarmControl::getMode(void)
   return this->mode_;
 }
 
+float AlarmControl::getCurrentDuty(void)
+{
+  return this->current_duty_;
+}
+
 void AlarmControl::setMode(AlarmControl::AlarmMode_t mode)
 {
   log_d("setMode %u", mode);
@@ -110,18 +116,21 @@ void AlarmControl::setOnMode(void)
 {
   log_d("setOnMode");
   this->setMode(ALARMMODE_FORCE_ON);
+  this->current_duty_ = this->duty_lights_on_;
 }
 
 void AlarmControl::setAlarmOFF(void)
 {
   log_d("setAlarmOFF");
   this->setMode(ALARMMODE_ALARM_OFF);
+  this->current_duty_ = 0.0f;
 }
 
 void AlarmControl::setAlarmON(void)
 {
   log_d("setAlarmON");
   this->setMode(ALARMMODE_ALARM_ON);
+  this->current_duty_ = 0.0f;
 }
 
 void AlarmControl::setAlarmTime(String alarm_time)
@@ -159,6 +168,8 @@ void AlarmControl::setDutyLightsOn(float duty)
   {
     log_d("setDutyLightsOn %.2f", duty);
     this->duty_lights_on_ = duty;
+    if (this->mode_ == ALARMMODE_FORCE_ON)
+      this->current_duty_ = this->duty_lights_on_;
   }
   else
     log_w("setDutyLightsOn failed: %.2f", duty);
@@ -254,6 +265,7 @@ void AlarmControl::task_alarm()
       if ((timeinfo.tm_wday == 6 || timeinfo.tm_wday == 0) && this->alarm_weekend_ == false)
       {
         this->led_control_->setOffMode();
+        this->current_duty_ = 0.0f;
         break;
       }
 
@@ -276,6 +288,7 @@ void AlarmControl::task_alarm()
         // too early
         log_d("outside of fading time. min diff: %f", minutes_diff);
         this->led_control_->setOffMode();
+        this->current_duty_ = 0.0f;
       }
       else if (minutes_diff < this->fade_minutes_)
       {
@@ -289,18 +302,21 @@ void AlarmControl::task_alarm()
 
         log_d("inside alarm time. min diff: %f duty calc: %f", minutes_diff, duty_calc);
         this->led_control_->setDutyCycle(duty_calc);
+        this->current_duty_ = duty_calc;
       }
       else
       {
         // we are after fading time
         log_d("outside of fading time. min diff: %f", minutes_diff);
-        this->led_control_->setOffMode(); // TODO
+        this->led_control_->setOffMode();
+        this->current_duty_ = 0.0f;
       }
       break;
     
     case ALARMMODE_ALARM_OFF:
       // alarm is off
       this->led_control_->setOffMode();
+      this->current_duty_ = 0.0f;
       break;
     
     default:

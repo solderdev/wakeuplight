@@ -8,8 +8,7 @@ class Logic {
         this.mode = 2
         this.duty_max = 99.0
         this.duty_lights_on = 60.0
-        // noinspection HttpUrlsUsage
-        // this.host_uri = "http://" + window.location.hostname + ":" + window.location.port + "/"
+        this.current_percent = 1.1
         this.host_uri = window.location.origin + "/"
 
         console.log("URI: " + this.host_uri)
@@ -69,18 +68,21 @@ class Logic {
         this.mode = parseInt(params[3])
         this.duty_max = parseFloat(params[4])
         this.duty_lights_on = parseFloat(params[5])
+        this.current_percent = parseFloat(params[6])
 
         console.log('update: alarm_time=' + this.alarm_time +
             ' alarm_weekend=' + this.alarm_weekend +
             ' fade_minutes=' + this.fade_minutes +
             ' mode=' + this.mode +
             ' duty_max=' + this.duty_max +
-            ' duty_lights_on=' + this.duty_lights_on)
+            ' duty_lights_on=' + this.duty_lights_on +
+            ' current_percent=' + this.current_percent)
 
         document.getElementById('alarm_time_input_id').value = this.alarm_time
         document.getElementById('alarm_weekend_input_id').checked = this.alarm_weekend
         document.getElementById('fade_minutes_input_id').value = this.fade_minutes
         document.getElementById('mode_id').innerHTML = this.modeToString(this.mode)
+        document.getElementById('mode_percent').innerHTML = this.current_percent + ' %'
         document.getElementById('duty_max_input_id').value = this.duty_max
         document.getElementById('duty_lights_on_input_id').value = this.duty_lights_on
         document.getElementById('duty_lights_on_input_id').style.background =

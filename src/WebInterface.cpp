@@ -109,7 +109,8 @@ String WebInterface::build_parameter_string(void)
     String(this->alarm_control_->getFadeMinutes()) + " " + 
     String(this->alarm_control_->getMode()) + " " + 
     String(this->alarm_control_->getDutyMax(), 3) + " " +
-    String(this->alarm_control_->getDutyLightsOn(), 3);
+    String(this->alarm_control_->getDutyLightsOn(), 3) + " " +
+    String(this->alarm_control_->getCurrentDuty(), 3);
 
   return params;
 }

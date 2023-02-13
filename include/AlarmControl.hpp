@@ -24,6 +24,7 @@ public:
   float getDutyMax(void);
   float getDutyLightsOn(void);
   AlarmMode_t getMode(void);
+  float getCurrentDuty(void);
   void setOnMode(void);
   void setMode(AlarmControl::AlarmMode_t mode);
   void setAlarmOFF(void);
@@ -49,6 +50,7 @@ private:
   float duty_max_nvm_;
   float duty_lights_on_;
   float duty_lights_on_nvm_;
+  float current_duty_;
   AlarmMode_t mode_;
   AlarmMode_t mode_nvm_;
 

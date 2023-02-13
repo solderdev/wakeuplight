@@ -107,15 +107,20 @@ html, body {
 }
 
 .mode-div {
-    display: flex;
+    display: grid;
     align-items: center;
+    text-align: center;
     justify-content: space-around;
     margin-top: 30px;
     margin-bottom: 30px;
 }
 
-.mode-a {
+.mode-name {
     font-size: 30px;
+}
+
+.mode-percent {
+    font-size: 18px;
 }
 
 input::-webkit-outer-spin-button,

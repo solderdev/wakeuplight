@@ -9,6 +9,7 @@ _alarm_mode = 0
 _fade_min = 44
 _duty_max = 99.8
 _duty_lights_on = 50.0
+_current_duty = 12.34
 
 
 @app.route('/')
@@ -18,7 +19,7 @@ def root():
 
 @app.get('/parameters')
 def parameters():
-    p_str = f'{_alarm_time} {"true" if _alarm_weekends else "false"} {_fade_min} {_alarm_mode} {_duty_max} {_duty_lights_on}'
+    p_str = f'{_alarm_time} {"true" if _alarm_weekends else "false"} {_fade_min} {_alarm_mode} {_duty_max} {_duty_lights_on} {_current_duty}'
     print(f'params: {p_str.encode()}')
     return p_str
 
