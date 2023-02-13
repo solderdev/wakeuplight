@@ -171,12 +171,18 @@ void AlarmControl::task_alarm_wrapper(void *arg)
 }
 void AlarmControl::task_alarm()
 {
+  #define RAMP_EXP_OFFSET 0.8f
+  #define RAMP_EXP_WIDTH  5.0f
   struct tm timeinfo;
   struct tm timeinfo_alarm;
   float duty_calc;
   float minutes_diff;
+  float exp_calc_max, exp_calc_min;
 
   this->led_control_->setOffMode();
+
+  exp_calc_min = 1.0f / (RAMP_EXP_OFFSET + expf(RAMP_EXP_WIDTH));
+  exp_calc_max = 1.0f / (RAMP_EXP_OFFSET + expf(-RAMP_EXP_WIDTH));
   
   while (1)
   {
@@ -274,8 +280,13 @@ void AlarmControl::task_alarm()
       else if (minutes_diff < this->fade_minutes_)
       {
         // if we are inside alarm time: calculate current fade duty cycle
-        duty_calc = minutes_diff * this->duty_max_ / this->fade_minutes_;
-        // TODO - calculate x^3 ramp with top at duty_max
+        // duty_calc = minutes_diff * this->duty_max_ / this->fade_minutes_;
+
+        // calculate sigmoid ramp with top at duty_max
+        duty_calc = (this->duty_max_ / (exp_calc_max - exp_calc_min)) * 
+                    (1.0f / (RAMP_EXP_OFFSET + expf(-RAMP_EXP_WIDTH * (2.0f * minutes_diff - this->fade_minutes_)/this->fade_minutes_))
+                    - exp_calc_min);
+
         log_d("inside alarm time. min diff: %f duty calc: %f", minutes_diff, duty_calc);
         this->led_control_->setDutyCycle(duty_calc);
       }

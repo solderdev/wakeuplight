@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 duty_max = 80
-duty_min = 0.001
+duty_min = 0.0  # 0.001
 fade_minutes = 40
 
 time_axis = np.arange(0, fade_minutes + 1)
@@ -15,9 +15,18 @@ def calc_duty_sig(sig_width, sig_offset):  # 5, 0.8 is nice!
     # sig_width: smaller --> smoother
     # sig_offset (0 to x): 1 = middle ; higher = earlier ; lower (>0) = later
     duty_sig = 1 / (sig_offset + np.exp(-sig_width * (time_axis - fade_minutes / 2) / fade_minutes * 2))
+    exp_min = duty_sig[0]
+    exp_max = duty_sig[-1]
     duty_sig *= (duty_max - duty_min) / (duty_sig[-1] - duty_sig[0])
     duty_sig -= duty_sig[0] - duty_min
     print(f'duty_sig: min: {duty_sig[0]:.4f}  max: {duty_sig[-1]:.4f}')
+
+    exp_calc_min = 1.0 / (sig_offset + np.exp(sig_width))
+    exp_calc_max = 1.0 / (sig_offset + np.exp(-sig_width))
+    c_calc = 1 / (sig_offset + np.exp(-sig_width * (2 * time_axis - fade_minutes) / fade_minutes)) - exp_calc_min
+    c_calc *= (duty_max / (exp_calc_max - exp_calc_min))
+    print(f'calc duty_sig: min: {c_calc[0]:.4f}  max: {c_calc[-1]:.4f}')
+
     return duty_sig
 
 
@@ -35,8 +44,9 @@ plt.plot(time_axis, duty_2, label='^2')
 plt.plot(time_axis, duty_3, label='^3')
 # for i in range(2, 8):
 #     plt.plot(time_axis, calc_duty_sig(i, 0.3), label=f'duty_sig: w={i}')
-for i in [0.3, 0.5, 0.8, 1.2, 2]:
-    plt.plot(time_axis, calc_duty_sig(5, i), label=f'duty_sig: w={5} o={i}')
+# for i in [0.3, 0.5, 0.8, 1.2, 2]:
+#     plt.plot(time_axis, calc_duty_sig(5, i), label=f'duty_sig: w={5} o={i}')
+plt.plot(time_axis, calc_duty_sig(5, 0.8), label=f'duty_sig: w={5} o={0.8}')
 plt.plot(time_axis, duty_sine, label='duty_sine')
 
 plt.grid()
