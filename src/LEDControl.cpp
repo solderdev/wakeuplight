@@ -11,7 +11,7 @@ LEDControl::LEDControl(uint8_t ctrl_pin_1, mcpwm_unit_t mcpwm_unit_id) :
   mcpwm_unit_(mcpwm_unit_id), 
   ctrl_pin_1(ctrl_pin_1)
 {
-  this->frequency_hz_ = 20000;
+  this->frequency_hz_ = 300;
   this->duty_percent_ = 50.0f;
   
   log_d("init mcpwm driver");
