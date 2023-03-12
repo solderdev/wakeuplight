@@ -260,6 +260,17 @@ void AlarmControl::task_alarm()
         vTaskDelay(pdMS_TO_TICKS(1000));
         break;
       }
+      // struct tm timeinfo:
+      // Member    Type  Meaning Range
+      // tm_sec    int   seconds after the minute  0-61 (0-59)
+      // tm_min    int   minutes after the hour    0-59
+      // tm_hour   int   hours since midnight      0-23
+      // tm_mday   int   day of the month          1-31
+      // tm_mon    int   months since January      0-11
+      // tm_year   int   years since 1900
+      // tm_wday   int   days since Sunday         0-6
+      // tm_yday   int   days since January 1      0-365
+      // tm_isdst  int   Daylight Saving Time flag
 
       // if we are on a weekend and option is off --> disable
       if ((timeinfo.tm_wday == 6 || timeinfo.tm_wday == 0) && this->alarm_weekend_ == false)

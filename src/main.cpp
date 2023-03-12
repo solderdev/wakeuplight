@@ -10,6 +10,7 @@
 #include "time.h"
 
 #include "esp32-hal-log.h"
+#include "esp_sntp.h"
 
 WebInterface *web_interface;
 LEDControl *led_control;
@@ -25,6 +26,11 @@ void systime_init()
 unsigned long IRAM_ATTR systime_ms()
 {
   return (unsigned long) ((esp_timer_get_time() * systime_multiplier) / 1000ULL);
+}
+
+void cbSyncTime(struct timeval *tv)  // callback function to show when NTP was synchronized
+{
+  log_i("NTP time synced");
 }
 
 void setup()
@@ -51,7 +57,16 @@ void setup()
 
   web_interface = new WebInterface(alarm_control);
 
-  configTime(3600, 3600, "time.tugraz.at");
+  // change NTP update interval
+  sntp_set_sync_interval(1 * 60 * 60 * 1000UL); // 1 hours
+  sntp_set_time_sync_notification_cb(cbSyncTime);  // set a Callback function for time synchronization notification
+
+  // time-zone needs to be set manually, otherwise DST switch date is wrong
+  // by https://werner.rothschopf.net/microcontroller/202103_arduino_esp32_ntp_en.htm
+  configTime(0, 0, "time.tugraz.at");
+  // list of TZ strings: https://github.com/nayarsystems/posix_tz_db/eblob/master/zones.csv
+  setenv("TZ", "CET-1CEST,M3.5.0,M10.5.0/3", 1);           // Set environment variable with your time zone
+  tzset();
 }
 
 void loop()
