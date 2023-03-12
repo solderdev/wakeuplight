@@ -16,6 +16,10 @@ class Logic {
             this.current_percent = parseFloat(e.data)
             document.getElementById('mode_percent').innerHTML = this.current_percent + ' %'
         })
+        evsource.addEventListener('currenttime', function(e) {
+            console.log('SSE currenttime', e.data)
+            document.getElementById('mode_time').innerHTML = e.data
+        })
 
         console.log("URI: " + this.host_uri)
 

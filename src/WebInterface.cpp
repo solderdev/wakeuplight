@@ -137,28 +137,26 @@ void WebInterface::task_http()
   // serve static files: images, html, js, css
   server_.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
 
-  // route to lights_on
+  // routes to buttons
   server_.on("/lights_on", HTTP_POST, [this](AsyncWebServerRequest *request) {
     log_d("Received lights_on");
     this->alarm_control_->setOnMode();
     request->send(200, "text/plain", this->build_parameter_string());
   });
 
-  // route to alarm_off
   server_.on("/alarm_off", HTTP_POST, [this](AsyncWebServerRequest *request) {
     log_d("Received alarm_off");
     this->alarm_control_->setAlarmOFF();
     request->send(200, "text/plain", this->build_parameter_string());
   });
 
-  // route to pwm_mode
   server_.on("/alarm_on", HTTP_POST, [this](AsyncWebServerRequest *request) {
     log_d("Received alarm_on");
     this->alarm_control_->setAlarmON();
     request->send(200, "text/plain", this->build_parameter_string());
   });
 
-  // route to set alarm time
+  // routes to setters
   server_.on("/set_alarm_time", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, 
     [this](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
       String alarm_time = String(data, len);
@@ -166,7 +164,6 @@ void WebInterface::task_http()
       request->send(200, "text/plain", this->build_parameter_string());
   });
 
-  // route to set alarm weekend
   server_.on("/set_alarm_weekend", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, 
     [this](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
       bool alarm_weekend = strncmp((const char*)(data), "true", len) == 0;
@@ -174,7 +171,6 @@ void WebInterface::task_http()
       request->send(200, "text/plain", this->build_parameter_string());
   });
 
-  // route to set duty cycle
   server_.on("/set_fade_minutes", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, 
     [this](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
       std::stringstream ss;
@@ -205,7 +201,7 @@ void WebInterface::task_http()
       request->send(200, "text/plain", this->build_parameter_string());
   });
 
-  // route to load style.css file
+  // route to fetch current parameters
   server_.on("/parameters", HTTP_GET, [this](AsyncWebServerRequest *request) {
     log_d("Received parameters req");
     String params = this->build_parameter_string();
@@ -213,13 +209,13 @@ void WebInterface::task_http()
     log_d("send parameters: %s", params);
   });
 
-  // route to reset
-  server_.on("/reset", HTTP_POST, [](AsyncWebServerRequest *request) {
+  // route to restart ESP
+  server_.on("/restart", HTTP_POST, [](AsyncWebServerRequest *request) {
     request->send(200);
     ESP.restart();
   });
 
-  // respond to GET requests on URL /heap
+  // route to get heap usage
   server_.on("/heap", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send(200, "text/plain", "Free heap: " + String(ESP.getFreeHeap()));
   });
@@ -240,6 +236,18 @@ void WebInterface::task_http()
 
     // live stream current percent every second
     events_.send(String(this->alarm_control_->getCurrentDuty(), 3).c_str(), "currentpercent", millis());
+
+    // send current time and time of last NTP sync
+    // String currenttime;
+    struct tm timeinfo = this->alarm_control_->getCurrentTime();
+    struct timeval lastntpsync = this->alarm_control_->getLastNTPSync();
+    struct tm *ntpsync = localtime(&lastntpsync.tv_sec);
+    char currenttime[63] = {0};
+    snprintf(currenttime, sizeof(currenttime), "<b>%02u:%02u:%02u</b><p>last NTP sync:<br />%u.%u.%u %02u:%02u:%02u</p>", 
+             timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec,
+             ntpsync->tm_mday, 1 + ntpsync->tm_mon, 1900 + ntpsync->tm_year,
+             ntpsync->tm_hour, ntpsync->tm_min, ntpsync->tm_sec);
+    events_.send(currenttime, "currenttime", millis());
 
     vTaskDelay(pdMS_TO_TICKS(1000));
   }

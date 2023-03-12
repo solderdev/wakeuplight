@@ -28,11 +28,6 @@ unsigned long IRAM_ATTR systime_ms()
   return (unsigned long) ((esp_timer_get_time() * systime_multiplier) / 1000ULL);
 }
 
-void cbSyncTime(struct timeval *tv)  // callback function to show when NTP was synchronized
-{
-  log_i("NTP time synced");
-}
-
 void setup()
 {
   setCpuFrequencyMhz(80);
@@ -59,7 +54,6 @@ void setup()
 
   // change NTP update interval
   sntp_set_sync_interval(1 * 60 * 60 * 1000UL); // 1 hours
-  sntp_set_time_sync_notification_cb(cbSyncTime);  // set a Callback function for time synchronization notification
 
   // time-zone needs to be set manually, otherwise DST switch date is wrong
   // by https://werner.rothschopf.net/microcontroller/202103_arduino_esp32_ntp_en.htm

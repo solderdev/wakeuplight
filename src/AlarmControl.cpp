@@ -1,6 +1,13 @@
 #include "AlarmControl.hpp"
 #include "Storage.hpp"
 #include "TaskConfig.hpp"
+#include "esp_sntp.h"
+
+
+static struct timeval last_ntp_sync_;
+
+void cbSyncTime(struct timeval *tv);
+
 
 AlarmControl::AlarmControl(LEDControl *led_control) :
   led_control_(led_control),
@@ -8,6 +15,7 @@ AlarmControl::AlarmControl(LEDControl *led_control) :
   current_duty_(98.765f)
 {
   this->preferences_ = new Preferences();
+  
   // load saved values
   preferences_lock.lock();
   this->preferences_->begin("alarmctrl");
@@ -63,6 +71,10 @@ AlarmControl::AlarmControl(LEDControl *led_control) :
 
   this->preferences_->end();
   preferences_lock.unlock();
+
+  last_ntp_sync_.tv_sec = 0;
+  last_ntp_sync_.tv_usec = 0;
+  sntp_set_time_sync_notification_cb(cbSyncTime);  // set a Callback function for time synchronization notification
 
   log_i("Initialized Alarm with: alarm_time_=%s alarm_weekend_=%s fade_minutes_=%u duty_max_=%.2f duty_lights_on=%.2f", 
         this->alarm_time_, (this->alarm_weekend_)?"true":"false", this->fade_minutes_, this->duty_max_, this->duty_lights_on_);
@@ -175,6 +187,23 @@ void AlarmControl::setDutyLightsOn(float duty)
     log_w("setDutyLightsOn failed: %.2f", duty);
 }
 
+struct tm AlarmControl::getCurrentTime(void)
+{
+  return this->timeinfo_;
+}
+
+void cbSyncTime(struct timeval *tv)  // callback function to show when NTP was synchronized
+{
+  log_i("NTP time synced");
+  last_ntp_sync_.tv_sec = tv->tv_sec;
+  last_ntp_sync_.tv_usec = tv->tv_usec;
+}
+
+struct timeval AlarmControl::getLastNTPSync(void)
+{
+  return last_ntp_sync_;
+}
+
 void AlarmControl::task_alarm_wrapper(void *arg)
 {
   AlarmControl* alarm_ctrl = static_cast<AlarmControl *>(arg);
@@ -184,7 +213,6 @@ void AlarmControl::task_alarm()
 {
   #define RAMP_EXP_OFFSET 0.8f
   #define RAMP_EXP_WIDTH  5.0f
-  struct tm timeinfo;
   struct tm timeinfo_alarm;
   float duty_calc;
   float minutes_diff;
@@ -253,7 +281,7 @@ void AlarmControl::task_alarm()
       break;
 
     case ALARMMODE_ALARM_ON:
-      if (!getLocalTime(&timeinfo, 100))
+      if (!getLocalTime(&this->timeinfo_, 100))
       {
         log_w("Failed to obtain time");
         // do not change anything
@@ -273,7 +301,7 @@ void AlarmControl::task_alarm()
       // tm_isdst  int   Daylight Saving Time flag
 
       // if we are on a weekend and option is off --> disable
-      if ((timeinfo.tm_wday == 6 || timeinfo.tm_wday == 0) && this->alarm_weekend_ == false)
+      if ((this->timeinfo_.tm_wday == 6 || this->timeinfo_.tm_wday == 0) && this->alarm_weekend_ == false)
       {
         this->led_control_->setOffMode();
         this->current_duty_ = 0.0f;
@@ -281,13 +309,13 @@ void AlarmControl::task_alarm()
       }
 
       // copy "now" for calculations
-      memcpy(&timeinfo_alarm, &timeinfo, sizeof(timeinfo));
+      memcpy(&timeinfo_alarm, &this->timeinfo_, sizeof(this->timeinfo_));
       timeinfo_alarm.tm_hour = String(this->alarm_time_).substring(0, 2).toInt();
       timeinfo_alarm.tm_min = String(this->alarm_time_).substring(3, 5).toInt();
       timeinfo_alarm.tm_sec = 0;
 
       // calculate distance to alarm time
-      minutes_diff = difftime(mktime(&timeinfo), mktime(&timeinfo_alarm)) / 60.0f;
+      minutes_diff = difftime(mktime(&this->timeinfo_), mktime(&timeinfo_alarm)) / 60.0f;
 
       // uint8_t start_h = String(this->alarm_time_).substring(0, 2).toInt();
       // uint8_t start_m = String(this->alarm_time_).substring(3, 5).toInt();

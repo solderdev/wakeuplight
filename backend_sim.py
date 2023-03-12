@@ -1,5 +1,6 @@
 import os
 import time
+from datetime import datetime
 from flask import Flask, render_template, request, Response
 
 app = Flask(__name__, static_folder='', template_folder='', root_path=os.path.join(os.getcwd(), 'data'))
@@ -24,6 +25,7 @@ def gen_currentpercent():
         time.sleep(1)
         # DO NOT forget the prefix and suffix
         yield f'\0\0id: {time.time_ns()}\r\nevent: currentpercent\r\ndata: {_current_duty:.3f}\r\n\r\n'
+        yield f'\0\0id: {time.time_ns()}\r\nevent: currenttime\r\ndata: <b>{datetime.now().strftime("%H:%M:%S")}</b><p>last NTP sync:<br />31.12.2001 01:23:45</p>\r\n\r\n'
 
 
 @app.route('/events')

@@ -123,6 +123,11 @@ html, body {
     font-size: 18px;
 }
 
+.mode-time {
+    margin-top: 10px;
+    font-size: 14px;
+}
+
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
     -webkit-appearance: none;

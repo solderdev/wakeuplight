@@ -34,12 +34,15 @@ public:
   void setFadeMinutes(uint32_t fade_minutes);
   void setDutyMax(float duty);
   void setDutyLightsOn(float duty);
+  struct tm getCurrentTime(void);
+  struct timeval getLastNTPSync(void);
 
 private:
   static void task_alarm_wrapper(void *arg);
   void task_alarm();
   LEDControl *led_control_;
   Preferences *preferences_;
+  struct tm timeinfo_;
   char alarm_time_[10];
   char alarm_time_nvm_[10];
   bool alarm_weekend_;
