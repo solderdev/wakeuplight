@@ -253,7 +253,7 @@ void AlarmControl::task_alarm()
       break;
 
     case ALARMMODE_ALARM_ON:
-      if (!getLocalTime(&timeinfo, 0))
+      if (!getLocalTime(&timeinfo, 100))
       {
         log_w("Failed to obtain time");
         // do not change anything
