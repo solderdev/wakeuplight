@@ -40,6 +40,8 @@ void LEDControl::updateTiming(uint32_t frequency_hz, float duty_percent)
   log_i("Setting frequency: %u", this->frequency_hz_);
   log_i("Setting duty-cycle: %f", this->duty_percent_);
 
+  vTaskSuspendAll();
+
   mcpwm_gpio_init(this->mcpwm_unit_, MCPWM0A, this->ctrl_pin_1);
 
   // set PWM-mode
@@ -60,6 +62,8 @@ void LEDControl::updateTiming(uint32_t frequency_hz, float duty_percent)
 
   // activate timer output
   mcpwm_set_timer_sync_output(this->mcpwm_unit_, MCPWM_TIMER_0, MCPWM_SWSYNC_SOURCE_TEZ);
+
+  xTaskResumeAll();
 }
 
 uint32_t LEDControl::getFrequencyHz(void)
