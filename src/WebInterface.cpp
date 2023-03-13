@@ -238,7 +238,6 @@ void WebInterface::task_http()
     events_.send(String(this->alarm_control_->getCurrentDuty(), 3).c_str(), "currentpercent", millis());
 
     // send current time and time of last NTP sync
-    // String currenttime;
     struct tm timeinfo = this->alarm_control_->getCurrentTime();
     struct timeval lastntpsync = this->alarm_control_->getLastNTPSync();
     struct tm *ntpsync = localtime(&lastntpsync.tv_sec);

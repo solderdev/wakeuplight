@@ -278,6 +278,7 @@ void AlarmControl::task_alarm()
     case ALARMMODE_FORCE_ON:
       // we are instructed to stay on
       this->led_control_->setDutyCycle(this->duty_lights_on_);
+      getLocalTime(&this->timeinfo_, 5);
       break;
 
     case ALARMMODE_ALARM_ON:
@@ -356,6 +357,7 @@ void AlarmControl::task_alarm()
       // alarm is off
       this->led_control_->setOffMode();
       this->current_duty_ = 0.0f;
+      getLocalTime(&this->timeinfo_, 5);
       break;
     
     default:
