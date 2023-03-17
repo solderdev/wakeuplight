@@ -27,9 +27,6 @@ void LEDControl::updateTiming(uint32_t frequency_hz, float duty_percent)
     // do not re-apply same values
     if (this->mode == LEDMODE_PWM && this->frequency_hz_ == frequency_hz && this->duty_percent_ == duty_percent)
       return;
-
-    this->frequency_hz_ = frequency_hz;
-    this->duty_percent_ = duty_percent;
   }
   else
   {
@@ -37,32 +34,39 @@ void LEDControl::updateTiming(uint32_t frequency_hz, float duty_percent)
     return;
   }
 
-  log_i("Setting frequency: %u", this->frequency_hz_);
-  log_i("Setting duty-cycle: %f", this->duty_percent_);
+  log_i("Setting frequency: %u", frequency_hz);
+  log_i("Setting duty-cycle: %f", duty_percent);
 
   vTaskSuspendAll();
 
-  mcpwm_gpio_init(this->mcpwm_unit_, MCPWM0A, this->ctrl_pin_1);
+  if (this->mode != LEDMODE_PWM || this->frequency_hz_ != frequency_hz)
+  {
+    mcpwm_gpio_init(this->mcpwm_unit_, MCPWM0A, this->ctrl_pin_1);
 
+    mcpwm_config_t pwm_config = {
+        .frequency = frequency_hz,
+        .cmpr_a = 0,
+        .cmpr_b = 0,
+        .duty_mode = MCPWM_DUTY_MODE_0,
+        .counter_mode = MCPWM_DOWN_COUNTER,
+    };
+    mcpwm_init(this->mcpwm_unit_, MCPWM_TIMER_0, &pwm_config);
+
+    mcpwm_set_duty_type(this->mcpwm_unit_, MCPWM_TIMER_0, MCPWM_GEN_A, MCPWM_DUTY_MODE_0);
+
+    // activate timer output
+    mcpwm_set_timer_sync_output(this->mcpwm_unit_, MCPWM_TIMER_0, MCPWM_SWSYNC_SOURCE_TEZ);
+  }
+
+  mcpwm_set_duty(this->mcpwm_unit_, MCPWM_TIMER_0, MCPWM_GEN_A, duty_percent);  // 100.0f - 
+  // mcpwm_set_frequency(this->mcpwm_unit_, MCPWM_TIMER_0, frequency_hz);
+  
   // set PWM-mode
   this->mode = LEDMODE_PWM;
 
-  mcpwm_config_t pwm_config = {
-      .frequency = this->frequency_hz_,
-      .cmpr_a = 0,
-      .cmpr_b = 0,
-      .duty_mode = MCPWM_DUTY_MODE_0,
-      .counter_mode = MCPWM_DOWN_COUNTER,
-  };
-  mcpwm_init(this->mcpwm_unit_, MCPWM_TIMER_0, &pwm_config);
+  this->frequency_hz_ = frequency_hz;
+  this->duty_percent_ = duty_percent;
   
-  mcpwm_set_duty(this->mcpwm_unit_, MCPWM_TIMER_0, MCPWM_GEN_A, this->duty_percent_);  // 100.0f - 
-
-  mcpwm_set_duty_type(this->mcpwm_unit_, MCPWM_TIMER_0, MCPWM_GEN_A, MCPWM_DUTY_MODE_0);
-
-  // activate timer output
-  mcpwm_set_timer_sync_output(this->mcpwm_unit_, MCPWM_TIMER_0, MCPWM_SWSYNC_SOURCE_TEZ);
-
   xTaskResumeAll();
 }
 
