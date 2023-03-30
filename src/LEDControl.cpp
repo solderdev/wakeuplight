@@ -41,6 +41,7 @@ void LEDControl::updateTiming(uint32_t frequency_hz, float duty_percent)
 
   if (this->mode != LEDMODE_PWM || this->frequency_hz_ != frequency_hz)
   {
+    mcpwm_set_duty(this->mcpwm_unit_, MCPWM_TIMER_0, MCPWM_GEN_A, duty_percent);  // 100.0f - 
     mcpwm_gpio_init(this->mcpwm_unit_, MCPWM0A, this->ctrl_pin_1);
 
     mcpwm_config_t pwm_config = {
