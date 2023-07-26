@@ -57,7 +57,7 @@ void setup()
 
   // time-zone needs to be set manually, otherwise DST switch date is wrong
   // by https://werner.rothschopf.net/microcontroller/202103_arduino_esp32_ntp_en.htm
-  configTime(0, 0, "time.tugraz.at");
+  configTime(0, 0, "time.metrologie.at");
   // list of TZ strings: https://github.com/nayarsystems/posix_tz_db/eblob/master/zones.csv
   setenv("TZ", "CET-1CEST,M3.5.0,M10.5.0/3", 1);           // Set environment variable with your time zone
   tzset();
