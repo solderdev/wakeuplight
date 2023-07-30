@@ -94,7 +94,7 @@ class Logic {
         document.getElementById('mode_id').innerHTML = this.modeToString(this.mode)
         document.getElementById('mode_percent').innerHTML = this.current_percent + ' %'
         document.getElementById('duty_max_input_id').value = this.duty_max
-        document.getElementById('duty_lights_on_input_id').value = this.duty_lights_on
+        document.getElementById('duty_lights_on_input_id').value = this.duty_lights_on / this.duty_max * 100
         document.getElementById('duty_lights_on_input_id').style.background =
             `linear-gradient(to right,#4BD663,#4BD663 ${this.duty_lights_on}%,#eee ${this.duty_lights_on}%)`;
     }

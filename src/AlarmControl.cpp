@@ -195,10 +195,12 @@ void AlarmControl::setDutyMax(float duty)
 
 void AlarmControl::setDutyLightsOn(float duty)
 {
+  // duty parameter is 0 --> 100 and will be scaled to actual max duty
+
   if (duty >= 0.0 && duty <= 100.0)
   {
     log_d("setDutyLightsOn %.2f", duty);
-    this->duty_lights_on_ = duty;
+    this->duty_lights_on_ = duty / 100.0f * this->duty_max_;
     if (this->mode_ == ALARMMODE_FORCE_ON)
       this->current_duty_ = this->duty_lights_on_;
   }
