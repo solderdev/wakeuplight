@@ -97,6 +97,19 @@ class Logic {
         document.getElementById('duty_lights_on_input_id').value = this.duty_lights_on / this.duty_max * 100
         document.getElementById('duty_lights_on_input_id').style.background =
             `linear-gradient(to right,#4BD663,#4BD663 ${this.duty_lights_on}%,#eee ${this.duty_lights_on}%)`;
+        if (this.mode === 0) {
+            document.getElementById('lights_on_button_id').style.backgroundColor = "#4CAF50";
+            document.getElementById('alarm_off_button_id').style.backgroundColor = "lightgray";
+            document.getElementById('alarm_on_button_id').style.backgroundColor = "lightgray";
+        } else if (this.mode === 1) {
+            document.getElementById('lights_on_button_id').style.backgroundColor = "lightgray";
+            document.getElementById('alarm_off_button_id').style.backgroundColor = "lightgray";
+            document.getElementById('alarm_on_button_id').style.backgroundColor = "#4CAF50";
+        } else if (this.mode === 2) {
+            document.getElementById('lights_on_button_id').style.backgroundColor = "lightgray";
+            document.getElementById('alarm_off_button_id').style.backgroundColor = "#4CAF50";
+            document.getElementById('alarm_on_button_id').style.backgroundColor = "lightgray";
+        }
     }
 
     fetchParameters() {
