@@ -37,6 +37,9 @@ public:
   struct tm getCurrentTime(void);
   struct timeval getLastNTPSync(void);
 
+  uint32_t sunrise_minutes;  // minutes after midnight
+  uint32_t sunset_minutes;  // minutes after midnight
+
 private:
   static void task_alarm_wrapper(void *arg);
   void task_alarm();

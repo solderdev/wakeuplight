@@ -2,9 +2,15 @@
 #include "Storage.hpp"
 #include "TaskConfig.hpp"
 #include "esp_sntp.h"
+#include "sunset.h"
+
+
+#define LATITUDE        47.073540
+#define LONGITUDE       15.437691
 
 
 static struct timeval last_ntp_sync_;
+SunSet sun;
 
 void cbSyncTime(struct timeval *tv);
 
@@ -72,9 +78,14 @@ AlarmControl::AlarmControl(LEDControl *led_control) :
   this->preferences_->end();
   preferences_lock.unlock();
 
-  last_ntp_sync_.tv_sec = 0;
+  last_ntp_sync_.tv_sec = 100812;  // set it to something other than 1.1.1970
   last_ntp_sync_.tv_usec = 0;
   sntp_set_time_sync_notification_cb(cbSyncTime);  // set a Callback function for time synchronization notification
+
+  sun.setPosition(LATITUDE, LONGITUDE, 0);  // set timezone later to account for DST
+
+  this->sunrise_minutes = 8 * 60;
+  this->sunset_minutes = 20 * 60;
 
   log_i("Initialized Alarm with: alarm_time_=%s alarm_weekend_=%s fade_minutes_=%u duty_max_=%.2f duty_lights_on=%.2f", 
         this->alarm_time_, (this->alarm_weekend_)?"true":"false", this->fade_minutes_, this->duty_max_, this->duty_lights_on_);
@@ -126,9 +137,17 @@ void AlarmControl::setMode(AlarmControl::AlarmMode_t mode)
 
 void AlarmControl::setOnMode(void)
 {
+  float new_duty;
   log_d("setOnMode");
+  // pre-set intensity depending on time vs. sunrise / sunset
+  if (this->timeinfo_.tm_hour * 60 + this->timeinfo_.tm_min > this->sunrise_minutes && 
+      this->timeinfo_.tm_hour * 60 + this->timeinfo_.tm_min < this->sunset_minutes)
+    new_duty = this->duty_max_;
+  else
+    new_duty = 20;
+  this->current_duty_ = new_duty;
+  this->duty_lights_on_ = new_duty;
   this->setMode(ALARMMODE_FORCE_ON);
-  this->current_duty_ = this->duty_lights_on_;
 }
 
 void AlarmControl::setAlarmOFF(void)
@@ -192,11 +211,33 @@ struct tm AlarmControl::getCurrentTime(void)
   return this->timeinfo_;
 }
 
+extern AlarmControl *alarm_control;
 void cbSyncTime(struct timeval *tv)  // callback function to show when NTP was synchronized
 {
+  static int currentDay = 99;
+
   log_i("NTP time synced");
   last_ntp_sync_.tv_sec = tv->tv_sec;
   last_ntp_sync_.tv_usec = tv->tv_usec;
+
+  // get time zone offset
+  std::time_t epoch_plus_11h = 60 * 60 * 11;
+  struct tm local_time, gm_time;
+  localtime_r(&epoch_plus_11h, &local_time);
+  gmtime_r(&epoch_plus_11h, &gm_time);
+  const int tz_diff = difftime(mktime(&local_time), mktime(&gm_time)) / 3600;
+  struct tm *ntpsync = localtime(&last_ntp_sync_.tv_sec);
+
+  if (currentDay != ntpsync->tm_mday)
+  {
+    currentDay = ntpsync->tm_mday;
+
+    sun.setCurrentDate(1900 + ntpsync->tm_year, 1 + ntpsync->tm_mon, ntpsync->tm_mday);
+    sun.setTZOffset(tz_diff + ((ntpsync->tm_isdst)?1:0));  // adjust for daylight saving time
+
+    alarm_control->sunrise_minutes = sun.calcSunrise();
+    alarm_control->sunset_minutes = sun.calcSunset();
+  }
 }
 
 struct timeval AlarmControl::getLastNTPSync(void)

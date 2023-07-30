@@ -9,6 +9,7 @@
 #include <string>
 #include "Pins.hpp"
 #include <sstream>
+#include "sunset.h"
 
 #include "Private.hpp"
 
@@ -240,12 +241,23 @@ void WebInterface::task_http()
     // send current time and time of last NTP sync
     struct tm timeinfo = this->alarm_control_->getCurrentTime();
     struct timeval lastntpsync = this->alarm_control_->getLastNTPSync();
-    struct tm *ntpsync = localtime(&lastntpsync.tv_sec);
-    char currenttime[63] = {0};
-    snprintf(currenttime, sizeof(currenttime), "<b>%02u:%02u:%02u</b><p>last NTP sync:<br />%u.%u.%u %02u:%02u:%02u</p>", 
+    struct tm ntpsync;
+    localtime_r(&lastntpsync.tv_sec, &ntpsync);
+
+    // do not indent! -> will lead to spaces being sent in string
+    char currenttime[200] = {0};
+    snprintf(currenttime, sizeof(currenttime), 
+"<b>%02u:%02u:%02u</b>\
+<p>last NTP sync:<br />\
+%u.%u.%u %02u:%02u:%02u<br />\
+sunrise: %02u:%02u<br />\
+sunset: %02u:%02u\
+</p>", 
              timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec,
-             ntpsync->tm_mday, 1 + ntpsync->tm_mon, 1900 + ntpsync->tm_year,
-             ntpsync->tm_hour, ntpsync->tm_min, ntpsync->tm_sec);
+             ntpsync.tm_mday, 1 + ntpsync.tm_mon, 1900 + ntpsync.tm_year, ntpsync.tm_hour, ntpsync.tm_min, ntpsync.tm_sec,
+             this->alarm_control_->sunrise_minutes / 60, this->alarm_control_->sunrise_minutes % 60,
+             this->alarm_control_->sunset_minutes / 60, this->alarm_control_->sunset_minutes % 60
+            );
     events_.send(currenttime, "currenttime", millis());
 
     vTaskDelay(pdMS_TO_TICKS(1000));
