@@ -18,7 +18,8 @@ void cbSyncTime(struct timeval *tv);
 AlarmControl::AlarmControl(LEDControl *led_control) :
   led_control_(led_control),
   task_handle_alarm_(nullptr),
-  current_duty_(98.765f)
+  current_duty_(98.765f),
+  duty_max_(95.0f)
 {
   this->preferences_ = new Preferences();
   
@@ -48,14 +49,14 @@ AlarmControl::AlarmControl(LEDControl *led_control) :
   }
   this->fade_minutes_nvm_ = this->fade_minutes_;
 
-  this->duty_max_ = this->preferences_->getFloat("duty_max", 0.0f);
-  if (this->duty_max_ <= 0.0f || this->duty_max_ > 99.999f)
+  this->snooze_minutes_ = this->preferences_->getUInt("snooze_min", 0);
+  if (this->snooze_minutes_ > 200)
   {
-    this->duty_max_ = 99.9f;
-    this->preferences_->putFloat("duty_max", this->duty_max_);
-    log_d("Setting default value for duty_max: %.2f", this->duty_max_);
+    this->snooze_minutes_ = 30;
+    this->preferences_->putUInt("snooze_min", this->snooze_minutes_);
+    log_d("Setting default value for snooze_min: %u", this->snooze_minutes_);
   }
-  this->duty_max_nvm_ = this->duty_max_;
+  this->snooze_minutes_nvm_ = this->snooze_minutes_;
 
   this->duty_lights_on_ = this->preferences_->getFloat("duty_lights_on", 0.0f);
   if (this->duty_lights_on_<= 0.0f || this->duty_lights_on_ > 100.0f)
@@ -87,8 +88,8 @@ AlarmControl::AlarmControl(LEDControl *led_control) :
   this->sunrise_minutes = 8 * 60;
   this->sunset_minutes = 20 * 60;
 
-  log_i("Initialized Alarm with: alarm_time_=%s alarm_weekend_=%s fade_minutes_=%u duty_max_=%.2f duty_lights_on=%.2f", 
-        this->alarm_time_, (this->alarm_weekend_)?"true":"false", this->fade_minutes_, this->duty_max_, this->duty_lights_on_);
+  log_i("Initialized Alarm with: alarm_time_=%s alarm_weekend_=%s fade_minutes_=%u duty_max_=%.2f duty_lights_on=%.2f snooze_minutes=%u", 
+        this->alarm_time_, (this->alarm_weekend_)?"true":"false", this->fade_minutes_, this->duty_max_, this->duty_lights_on_, this->snooze_minutes_);
 
   if (xTaskCreate(&AlarmControl::task_alarm_wrapper, "task_alarm", TaskConfig::Alarm_stacksize, this, TaskConfig::Alarm_priority, &task_handle_alarm_) != pdPASS)
     log_e("Alarm ERROR task init failed");
@@ -127,6 +128,11 @@ AlarmControl::AlarmMode_t AlarmControl::getMode(void)
 float AlarmControl::getCurrentDuty(void)
 {
   return this->current_duty_;
+}
+
+uint32_t AlarmControl::getSnoozeMinutes(void)
+{
+  return this->snooze_minutes_;
 }
 
 void AlarmControl::setMode(AlarmControl::AlarmMode_t mode)
@@ -208,6 +214,12 @@ void AlarmControl::setDutyLightsOn(float duty)
     log_w("setDutyLightsOn failed: %.2f", duty);
 }
 
+void AlarmControl::setSnoozeMinutes(uint32_t snooze_minutes)
+{
+  log_d("setSnoozeMinutes %u", snooze_minutes);
+  this->snooze_minutes_ = snooze_minutes;
+}
+
 struct tm AlarmControl::getCurrentTime(void)
 {
   return this->timeinfo_;
@@ -279,11 +291,11 @@ void AlarmControl::task_alarm()
       this->preferences_->putBool("alarmwe", this->alarm_weekend_);
       this->preferences_->end();
     }
-    if (this->duty_max_ != this->duty_max_nvm_)
+    if (this->snooze_minutes_ != this->snooze_minutes_nvm_)
     {
-      this->duty_max_nvm_ = this->duty_max_;
+      this->snooze_minutes_nvm_ = this->snooze_minutes_;
       this->preferences_->begin("alarmctrl");
-      this->preferences_->putFloat("duty_max", this->duty_max_);
+      this->preferences_->putUInt("snooze_min", this->snooze_minutes_);
       this->preferences_->end();
     }
     if (this->duty_lights_on_ != this->duty_lights_on_nvm_)
@@ -386,6 +398,12 @@ void AlarmControl::task_alarm()
         log_d("inside alarm time. min diff: %f duty calc: %f", minutes_diff, duty_calc);
         this->led_control_->setDutyCycle(duty_calc);
         this->current_duty_ = duty_calc;
+      }
+      else if (minutes_diff < this->fade_minutes_ + this->snooze_minutes_)
+      {
+        log_d("after alarm time. min diff: %f duty max: %f", minutes_diff, this->duty_max_);
+        this->led_control_->setDutyCycle(this->duty_max_);
+        this->current_duty_ = this->duty_max_;
       }
       else
       {

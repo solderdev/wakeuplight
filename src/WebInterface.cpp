@@ -112,7 +112,8 @@ String WebInterface::build_parameter_string(void)
     String(this->alarm_control_->getMode()) + " " + 
     String(this->alarm_control_->getDutyMax(), 3) + " " +
     String(this->alarm_control_->getDutyLightsOn(), 3) + " " +
-    String(this->alarm_control_->getCurrentDuty(), 3);
+    String(this->alarm_control_->getCurrentDuty(), 3) + " " +
+    String(this->alarm_control_->getSnoozeMinutes());
 
   return params;
 }
@@ -182,13 +183,13 @@ void WebInterface::task_http()
       request->send(200, "text/plain", this->build_parameter_string());
   });
 
-  server_.on("/set_duty_max", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, 
+  server_.on("/set_snooze_minutes", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL, 
     [this](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
       std::stringstream ss;
       ss << (char*)data;
-      float duty_max;
-      ss >> duty_max;
-      this->alarm_control_->setDutyMax(duty_max);
+      float snooze_minutes;
+      ss >> snooze_minutes;
+      this->alarm_control_->setSnoozeMinutes(snooze_minutes);
       request->send(200, "text/plain", this->build_parameter_string());
   });
 

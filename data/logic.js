@@ -5,6 +5,7 @@ class Logic {
         this.alarm_time = "11:11"
         this.alarm_weekend = false
         this.fade_minutes = 20
+        this.snooze_minutes = 30
         this.mode = 2
         this.duty_max = 99.0
         this.duty_lights_on = 60.0
@@ -47,9 +48,9 @@ class Logic {
         document.getElementById('fade_minutes_form_id').addEventListener(
             "submit", event => this.onSubmitPreventDefault(event), true)
 
-        document.getElementById('duty_max_form_id').addEventListener(
-            "change", event => this.onSubmitDutyMax(event), true)
-        document.getElementById('duty_max_form_id').addEventListener(
+        document.getElementById('snooze_minutes_form_id').addEventListener(
+            "change", event => this.onSubmitSnoozeMinutes(event), true)
+        document.getElementById('snooze_minutes_form_id').addEventListener(
             "submit", event => this.onSubmitPreventDefault(event), true)
 
         document.getElementById('duty_lights_on_form_id').addEventListener(
@@ -79,6 +80,7 @@ class Logic {
         this.duty_max = parseFloat(params[4])
         this.duty_lights_on = parseFloat(params[5])
         this.current_percent = parseFloat(params[6])
+        this.snooze_minutes = parseInt(params[7])
 
         console.log('update: alarm_time=' + this.alarm_time +
             ' alarm_weekend=' + this.alarm_weekend +
@@ -86,14 +88,15 @@ class Logic {
             ' mode=' + this.mode +
             ' duty_max=' + this.duty_max +
             ' duty_lights_on=' + this.duty_lights_on +
-            ' current_percent=' + this.current_percent)
+            ' current_percent=' + this.current_percent + 
+            ' snooze_minutes=' + this.snooze_minutes)
 
         document.getElementById('alarm_time_input_id').value = this.alarm_time
         document.getElementById('alarm_weekend_input_id').checked = this.alarm_weekend
         document.getElementById('fade_minutes_input_id').value = this.fade_minutes
         document.getElementById('mode_id').innerHTML = this.modeToString(this.mode)
         document.getElementById('mode_percent').innerHTML = this.current_percent + ' %'
-        document.getElementById('duty_max_input_id').value = this.duty_max
+        document.getElementById('snooze_minutes_input_id').value = this.snooze_minutes
         document.getElementById('duty_lights_on_input_id').value = this.duty_lights_on / this.duty_max * 100
         document.getElementById('duty_lights_on_input_id').style.background =
             `linear-gradient(to right,#4BD663,#4BD663 ${this.duty_lights_on}%,#eee ${this.duty_lights_on}%)`;
@@ -181,13 +184,13 @@ class Logic {
         this.post_and_fetch("set_fade_minutes", fade_m.toString() + '\0')
     }
 
-    onSubmitDutyMax(event) {
-        console.log("onSubmitDutyMax()")
+    onSubmitSnoozeMinutes(event) {
+        console.log("onSubmitSnoozeMinutes()")
         event.preventDefault()
-        let duty = Math.max(0.001, parseFloat(document.getElementById('duty_max_input_id').value))
-        duty = Math.min(99.999, duty)
-        console.log("Max Duty: " + duty.toString())
-        this.post_and_fetch("set_duty_max", duty.toString() + '\0')
+        let snooze_m = Math.max(0, parseFloat(document.getElementById('snooze_minutes_input_id').value))
+        snooze_m = Math.min(200, snooze_m)
+        console.log("Snooze Minutes: " + snooze_m.toString())
+        this.post_and_fetch("set_snooze_minutes", snooze_m.toString() + '\0')
     }
 
     onSubmitDutyLightsOn(event) {

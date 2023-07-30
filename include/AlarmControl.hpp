@@ -25,6 +25,7 @@ public:
   float getDutyLightsOn(void);
   AlarmMode_t getMode(void);
   float getCurrentDuty(void);
+  uint32_t getSnoozeMinutes(void);
   void setOnMode(void);
   void setMode(AlarmControl::AlarmMode_t mode);
   void setAlarmOFF(void);
@@ -34,6 +35,7 @@ public:
   void setFadeMinutes(uint32_t fade_minutes);
   void setDutyMax(float duty);
   void setDutyLightsOn(float duty);
+  void setSnoozeMinutes(uint32_t snooze_minutes);
   struct tm getCurrentTime(void);
   struct timeval getLastNTPSync(void);
 
@@ -53,7 +55,8 @@ private:
   uint32_t fade_minutes_;
   uint32_t fade_minutes_nvm_;
   float duty_max_;
-  float duty_max_nvm_;
+  uint32_t snooze_minutes_;
+  uint32_t snooze_minutes_nvm_;
   float duty_lights_on_;
   float duty_lights_on_nvm_;
   float current_duty_;
