@@ -28,48 +28,46 @@
     </div>
   </div>
 
-  <div id="databeam_div_id" class="container">
-    <div class="container-left">
-      <button id="lights_on_button_id" class="control-buttons" type="button">Lights ON</button>
-      <button id="alarm_off_button_id" class="control-buttons" type="button">Alarm OFF</button>
-      <button id="alarm_on_button_id" class="control-buttons" type="button">Alarm ON</button>
+  <div class="container">
+    <button id="lights_on_button_id" class="control-buttons" type="button">Lights ON</button>
+    <button id="alarm_off_button_id" class="control-buttons" type="button">Alarm OFF</button>
+    <button id="alarm_on_button_id" class="control-buttons" type="button">Alarm ON</button>
 
-      <form id="alarm_time_form_id" class="container-input-form">
-        <label for="alarm_time_input_id" class="label-left">Alarm Start Time:</label>
-        <input type="time" required step="60" id="alarm_time_input_id" class="input-form" spellcheck="false" />
-      </form>
+    <form id="alarm_time_form_id" class="container-input-form">
+      <label for="alarm_time_input_id" class="label-left">Alarm Start Time:</label>
+      <input type="time" required step="60" id="alarm_time_input_id" class="input-form" spellcheck="false" />
+    </form>
 
-      <form id="alarm_weekend_form_id" class="container-input-form">
-        <label for="alarm_weekend_input_id" class="label-left">Alarm on Weekends:</label>
-        <input type="checkbox" id="alarm_weekend_input_id" class="input-form" />
-      </form>
+    <form id="alarm_weekend_form_id" class="container-input-form">
+      <label for="alarm_weekend_input_id" class="label-left">Alarm on Weekends:</label>
+      <input type="checkbox" id="alarm_weekend_input_id" class="input-form" />
+    </form>
 
-      <form id="fade_minutes_form_id" class="container-input-form">
-        <label for="fade_minutes_input_id" class="label-left">Fade Minutes:</label>
-        <input type="number" id="fade_minutes_input_id" class="input-form" spellcheck="false" step="1" min="1" max="120" />
-      </form>
+    <form id="fade_minutes_form_id" class="container-input-form">
+      <label for="fade_minutes_input_id" class="label-left">Fade Minutes:</label>
+      <input type="number" id="fade_minutes_input_id" class="input-form" spellcheck="false" step="1" min="1" max="120" />
+    </form>
 
-      <form id="snooze_minutes_form_id" class="container-input-form">
-        <label for="snooze_minutes_input_id" class="label-left">Snooze Minutes:</label>
-        <input type="number" id="snooze_minutes_input_id" class="input-form" spellcheck="false" step="1" min="0" max="200" />
-      </form>
+    <form id="snooze_minutes_form_id" class="container-input-form">
+      <label for="snooze_minutes_input_id" class="label-left">Snooze Minutes:</label>
+      <input type="number" id="snooze_minutes_input_id" class="input-form" spellcheck="false" step="1" min="0" max="200" />
+    </form>
 
-      <form id="duty_lights_on_form_id" class="container-input-form">
-        <label for="duty_lights_on_input_id" class="label-left">Lights-on &#37;:</label>
-        <input type="range" id="duty_lights_on_input_id" class="range-slider" step="0.1" min="0.0" max="100.0" />
-      </form>
+    <form id="duty_lights_on_form_id" class="container-input-form">
+      <label for="duty_lights_on_input_id" class="label-left">Lights-on &#37;:</label>
+      <input type="range" id="duty_lights_on_input_id" class="range-slider" step="0.1" min="0.0" max="100.0" />
+    </form>
 
-      <div class="mode-div">
-        <a id="mode_id" class="mode-name">
-          initializing
-        </a>
-        <a id="mode_percent" class="mode-percent">
-          55%
-        </a>
-        <a id="mode_time" class="mode-time">
-          <b>00:00:00</b><p>last NTP sync:<br />31.12.2000 00:00:00</p>
-        </a>
-      </div>
+    <div class="mode-div">
+      <a id="mode_id" class="mode-name">
+        initializing
+      </a>
+      <a id="mode_percent" class="mode-percent">
+        55%
+      </a>
+      <a id="mode_time" class="mode-time">
+        <b>00:00:00</b><p>last NTP sync:<br />31.12.2000 00:00:00</p>
+      </a>
     </div>
   </div>
 </body>
