@@ -242,7 +242,8 @@ void cbSyncTime(struct timeval *tv)  // callback function to show when NTP was s
   const int tz_diff = difftime(mktime(&local_time), mktime(&gm_time)) / 3600;
   struct tm *ntpsync = localtime(&last_ntp_sync_.tv_sec);
 
-  if (currentDay != ntpsync->tm_mday)
+  // check every day after 4am (consider daylight saving time changes)
+  if (currentDay != ntpsync->tm_mday && ntpsync->tm_hour >= 4)
   {
     currentDay = ntpsync->tm_mday;
 
